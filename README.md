@@ -4,7 +4,7 @@
 
 `tempy` will render a simple, visually pleasing weather report for current and near-future conditions to your terminal.
 
-No API key required, but you can register one for yourself if you wish. See the section on [registering your own API key](#api-key-registry)
+`tempy` does not require an API key, but you can register one for yourself if you wish. See the section on [registering your own API key](#api-key-registry)
 
 ## Installation
 
