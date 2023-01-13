@@ -4,7 +4,7 @@
 
 `tempy` will render a simple, visually pleasing weather report for current and near-future conditions to your terminal.
 
-No API key required, but you can register one for yourself if you wish. See the section on [registering your own API key](#api-key-registry)
+`tempy` does not require an API key, but you can register one for yourself if you wish. See the section on [registering your own API key](#api-key-registry)
 
 ## Installation
 
@@ -27,7 +27,7 @@ cd ../ && rm -rf tempy
 
 By default, `tempy` makes requests to the [https://www.weatherapi.com](https://www.weatherapi.com/) API endpoint via my proxy server at [http://www.noprobelm.dev](http://www.noprobelm.dev). This is to prevent you from needing to register your own API key. 
 
-If you'd rather not make requests through my server, you can always register your own key for free in minutes at [www.weatherapi.com](https://www.weatherapi.com/). Just store your key in `$HOME/.config/pwearc` and `tempy` will take care of the rest. 
+If you'd rather not make requests through my server, you can always register your own key for free in minutes at [www.weatherapi.com](https://www.weatherapi.com/). Just store your key in `$HOME/.config/tempyrc` and `tempy` will take care of the rest. 
 
 # Credits
 
