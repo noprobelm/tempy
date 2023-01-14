@@ -10,10 +10,11 @@ from rich import box
 from .console import console
 from .themes import Default
 from .data import Data
+from .config import Config
 
 
 class Report:
-    def __init__(self, config: "Config") -> None:
+    def __init__(self, config: Config) -> None:
         self.data = Data(config["location"], config["api_key"])
         self.measurement_system = config["measurement_system"]
 
