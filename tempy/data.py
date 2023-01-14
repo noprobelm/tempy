@@ -51,12 +51,13 @@ class Data(dict):
         }
 
         forecast = []
-        for day in data["forecast"]["forecastday"]:
+        for num, day in enumerate(data["forecast"]["forecastday"]):
             selected = day["day"]
             forecast.append(
                 {
                     "date": (
-                        datetime.fromtimestamp(day["date_epoch"]) + timedelta(days=1)
+                        datetime.fromtimestamp(data["location"]["localtime_epoch"])
+                        + timedelta(days=num)
                     ).strftime("%A, %B %-d"),
                     "imperial": {
                         "average": f"{selected['avgtemp_f']}°F",
