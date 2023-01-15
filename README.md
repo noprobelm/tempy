@@ -9,9 +9,7 @@
 ## Installation
 
 ```
-git clone git@github.com:noprobelm/tempy.git && cd tempy
-pip install .
-cd ../ && rm -rf tempy
+pip install git+https://github.com/noprobelm/tempy
 ```
 
 ## Usage
