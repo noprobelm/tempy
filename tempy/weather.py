@@ -10,10 +10,62 @@ from rich import box
 from .console import console
 from .themes import Default
 from .data import Data
+from .config import Config
+
+
+class WeatherTable:
+    def __init__(self, title: Optional[Union[Text, str]] = None, **table_data):
+        self.title = title
+        for label in table_data:
+            table_data[label] = str(table_data[label])
+            setattr(self, label, table_data[label])
+        self.renderable = table_data
+
+    @property
+    def renderable(self) -> Table:
+        return self._renderable
+
+    @renderable.setter
+    def renderable(self, table_data: dict) -> None:
+        labels = Column(
+            "labels",
+            width=max([len(label) for label in table_data.keys()]),
+            no_wrap=True,
+            style=Default.information,
+        )
+        values = Column(
+            "values",
+            width=max([len(str(value)) for value in table_data.values()]),
+            no_wrap=True,
+            style=Default.information,
+        )
+        self._renderable = Table(
+            labels,
+            values,
+            show_edge=False,
+            expand=False,
+            show_header=False,
+            title_style=Default.table_header,
+            border_style=Default.table_divider,
+        )
+        if self.title:
+            self._renderable.title = f"{self.title}\n"
+        for label in table_data:
+            self._renderable.add_row(label.title(), table_data[label])
+
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
+        yield self.renderable
+
+    def __rich_measure__(
+        self, console: Console, options: ConsoleOptions
+    ) -> Measurement:
+        return console.measure(self.renderable)
 
 
 class Report:
-    def __init__(self, config: "Config") -> None:
+    def __init__(self, config: Config) -> None:
         self.data = Data(config["location"], config["api_key"])
         self.measurement_system = config["measurement_system"]
 
@@ -47,7 +99,7 @@ class Report:
         return art
 
     @property
-    def weather_table(self) -> "WeatherTable":
+    def weather_table(self) -> WeatherTable:
         if self.measurement_system == "imperial":
             weather_table = WeatherTable(
                 title="Current Conditions", **self.data["weather"]["imperial"]
@@ -60,7 +112,7 @@ class Report:
         return weather_table
 
     @property
-    def forecast_tables(self) -> List["WeatherTable"]:
+    def forecast_tables(self) -> List[WeatherTable]:
         forecast = self.data["forecast"]
         if self.measurement_system == "imperial":
             forecast_tables = [
@@ -143,54 +195,3 @@ class Report:
         )
         yield today
         yield future
-
-
-class WeatherTable:
-    def __init__(self, title: Optional[Union[Text, str]] = None, **table_data):
-        self.title = title
-        for label in table_data:
-            table_data[label] = str(table_data[label])
-            setattr(self, label, table_data[label])
-        self.renderable = table_data
-
-    @property
-    def renderable(self) -> Table:
-        return self._renderable
-
-    @renderable.setter
-    def renderable(self, table_data: dict) -> None:
-        labels = Column(
-            "labels",
-            width=max([len(label) for label in table_data.keys()]),
-            no_wrap=True,
-            style=Default.information,
-        )
-        values = Column(
-            "values",
-            width=max([len(str(value)) for value in table_data.values()]),
-            no_wrap=True,
-            style=Default.information,
-        )
-        self._renderable = Table(
-            labels,
-            values,
-            show_edge=False,
-            expand=False,
-            show_header=False,
-            title_style=Default.table_header,
-            border_style=Default.table_divider,
-        )
-        if self.title:
-            self._renderable.title = f"{self.title}\n"
-        for label in table_data:
-            self._renderable.add_row(label.title(), table_data[label])
-
-    def __rich_console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
-        yield self.renderable
-
-    def __rich_measure__(
-        self, console: Console, options: ConsoleOptions
-    ) -> Measurement:
-        return console.measure(self.renderable)
