@@ -1,6 +1,7 @@
 import requests
 from datetime import datetime, timedelta
 from typing import Union
+from .console import console
 
 
 class Data(dict):
@@ -15,9 +16,16 @@ class Data(dict):
                 f"{self.api_endpoint}?key={api_key}&q={location}&days=3&awi=yes"
             ).json()
         else:
-            data = requests.get(
+            response = requests.get(
                 f"{self.proxy_server}", headers={"location": location}
-            ).json()
+            )
+            if response.status_code == 400:
+                console.print(
+                    "Rate limit exceeded (max 20 requests per 2 minutes). Try again soon."
+                )
+                quit()
+            else:
+                data = response.json()
 
         localdata = {
             "location": f"{data['location']['name']}, {data['location']['region']}",
