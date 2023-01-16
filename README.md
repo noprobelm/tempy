@@ -8,13 +8,17 @@
 
 ## Installation
 
+You can install `tempy` using `pip`
+
 ```
 pip install git+https://github.com/noprobelm/tempy
 ```
 
+For Arch users, install the `tempy-git` package from the AUR 
+
 ## Usage
 
-- Use `tempy new york city` to get the current weather for NYC
+- Use `tempy new york city` to get the current weather for New York City
 
 - Units are imperial by default. Specify the unit system you desire with the `-u` or `--units` flags: `tempy new york city -u metric` 
 
@@ -29,7 +33,7 @@ If you'd rather not make requests through my server, you can always register you
 
 # Credits
 
-- Credits due to [Will McGugan](https://github.com/willmcgugan) and the team at [textualize](https://www.textualize.io/) for creating such a wonderfully robust tool for rendering rich text to the terminal using Python.
+- Credit due to [Will McGugan](https://github.com/willmcgugan) and the team at [textualize](https://www.textualize.io/) for creating such a wonderfully robust tool for rendering rich text to the terminal using Python.
 
 # License
 
