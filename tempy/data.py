@@ -29,8 +29,8 @@ class Data(dict):
 
         localdata = {
             "location": f"{data['location']['name']}, {data['location']['region']}",
-            "localtime": datetime.fromtimestamp(
-                data["location"]["localtime_epoch"]
+            "localtime": datetime.strptime(
+                data["location"]["localtime"], "%Y-%m-%d %H:%M"
             ).strftime("%A, %B %-d | %H:%M"),
         }
         weather = {
@@ -64,7 +64,9 @@ class Data(dict):
             forecast.append(
                 {
                     "date": (
-                        datetime.fromtimestamp(data["location"]["localtime_epoch"])
+                        datetime.strptime(
+                            data["location"]["localtime"], "%Y-%m-%d %H:%M"
+                        )
                         + timedelta(days=num)
                     ).strftime("%A, %B %-d"),
                     "imperial": {
