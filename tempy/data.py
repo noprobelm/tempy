@@ -19,9 +19,9 @@ class Data(dict):
             response = requests.get(
                 f"{self.proxy_server}", headers={"location": location}
             )
-            if response.status_code == 400:
+            if response.status_code == 429:
                 console.print(
-                    "Rate limit exceeded (max 20 requests per 2 minutes). Try again soon."
+                    "Rate limit exceeded. Try again in a few minutes.\nIf you feel the rate limit is too strict, create an issue at github.com/noprobelm/tempy"
                 )
                 quit()
             else:
