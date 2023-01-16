@@ -39,6 +39,7 @@ class Data(dict):
             "imperial": {
                 "temperature": f"{data['current']['temp_f']}°F",
                 "wind": f"{data['current']['wind_mph']} mph {data['current']['wind_dir']}",
+                "gusts": f"{data['current']['gust_mph']} mph",
                 "pressure": f"{data['current']['pressure_in']} inHg",
                 "precipitation": f"{data['current']['precip_in']} in",
                 "visibility": f"{data['current']['vis_miles']} mi",
@@ -49,7 +50,8 @@ class Data(dict):
             "metric": {
                 "temperature": f"{data['current']['temp_c']}°C",
                 "wind": f"{data['current']['wind_kph']} kph {data['current']['wind_dir']}",
-                "pressure": f"{int(data['current']['pressure_mb'])} mbar",
+                "gusts": f"{data['current']['gust_kph']} kph",
+                "pressure": f"{int(data['current']['pressure_mb'])} mb",
                 "precipitation": f"{data['current']['precip_mm']} mm",
                 "visibility": f"{data['current']['vis_km']} km",
                 "humidity": f"{data['current']['humidity']}%",
