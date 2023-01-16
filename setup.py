@@ -1,7 +1,7 @@
 import pathlib
 from setuptools import setup
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 __author__ = "Jeff Barfield"
 __author_email__ = "noprobelm@protonmail.com"
 
