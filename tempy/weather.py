@@ -78,6 +78,10 @@ class Report:
         return Text(self.data["localdata"]["localtime"], style=Default.report_header)
 
     @property
+    def alert(self) -> Text:
+        return Text(self.data["weather"]["alert"], style=Default.table_header)
+
+    @property
     def art(self) -> Text:
         if self.data["weather"]["is_day"]:
             file_suffix = "day"
@@ -165,9 +169,14 @@ class Report:
             box=box.HEAVY,
             border_style=Default.panel_border_style,
         )
-        future = Table.grid(
-            Column("1"),
-            Column("2"),
+        future = Table(
+            Column("1", justify="left"),
+            Column("2", justify="right"),
+            show_edge=False,
+            show_lines=False,
+            box=None,
+            show_header=False,
+            padding=0,
         )
         future.width = console.measure(today).maximum
         future.add_row(
@@ -175,13 +184,13 @@ class Report:
                 Align(forecast_tables[1], "center"),
                 box=box.HEAVY,
                 style=Default.panel_border_style,
-                width=future.width // 2,
+                width=(future.width // 2 - 1),
             ),
             Panel(
                 Align(forecast_tables[2], "center"),
                 box=box.HEAVY,
                 style=Default.panel_border_style,
-                width=future.width // 2,
+                width=(future.width // 2),
             ),
         ),
         yield today
