@@ -49,7 +49,7 @@ class Data(dict):
             "metric": {
                 "temperature": f"{data['current']['temp_c']}°C",
                 "wind": f"{data['current']['wind_kph']} kph {data['current']['wind_dir']}",
-                "pressure": f"{data['current']['pressure_in']} mmHg",
+                "pressure": f"{int(data['current']['pressure_mb'])} mbar",
                 "precipitation": f"{data['current']['precip_mm']} mm",
                 "visibility": f"{data['current']['vis_km']} km",
                 "humidity": f"{data['current']['humidity']}%",
