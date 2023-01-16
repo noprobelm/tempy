@@ -13,7 +13,7 @@ class Data(dict):
     def __init__(self, location: str, api_key: Union[str, None]):
         if api_key:
             data = requests.get(
-                f"{self.api_endpoint}?key={api_key}&q={location}&days=3&awi=yes"
+                f"{self.api_endpoint}?key={api_key}&q={location}&days=3&aqi=yes&alerts=yes"
             ).json()
         else:
             response = requests.get(
