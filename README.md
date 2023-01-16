@@ -14,7 +14,7 @@ pip install git+https://github.com/noprobelm/tempy
 
 ## Usage
 
-- Use `tempy new york city` to get the current weather for NYC
+- Use `tempy new york city` to get the current weather for New York City
 
 - Units are imperial by default. Specify the unit system you desire with the `-u` or `--units` flags: `tempy new york city -u metric` 
 
