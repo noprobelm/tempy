@@ -24,7 +24,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     packages=["tempy"],
-    package_data={"": ["assets/*.txt"]},
+    package_data={"": ["assets/*.txt", "tempyrc"]},
     include_package_data=True,
     install_requires=["requests", "rich"],
     entry_points={"console_scripts": ["tempy=tempy.__main__:main"]},

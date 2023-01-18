@@ -1,8 +1,8 @@
 import os
+from pathlib import Path
 import argparse
-import re
 
-VALID_OPTIONS = "location", "measurement_system", "api_key"
+VALID_OPTIONS = "location", "units", "api_key"
 TEMPYRC = f"{os.path.expanduser('~')}/.config/tempyrc"
 
 
@@ -10,31 +10,37 @@ class TempyRC(dict):
     def __init__(self):
         try:
             with open(TEMPYRC, "r") as f:
-                tempyrc = [option.split("=") for option in f.readlines()]
-                for idx in range(len(tempyrc)):
-                    tempyrc[idx][0] = tempyrc[idx][0].strip()
-                    tempyrc[idx][1] = tempyrc[idx][1].strip()
+                config = self.parse(f.readlines())
 
         except FileNotFoundError:
+            parent = Path(__file__).parent
+            skel = f"{parent}/tempyrc"
+            with open(skel, "r") as f:
+                skel = f.read()
             with open(TEMPYRC, "w") as f:
-                f.write("location=\nunits=\napi_key=\n")
+                f.write(skel)
             super().__init__({option: "" for option in VALID_OPTIONS})
             return
 
-        options = {}
-        for option in tempyrc:
-            if option[0] == "location":
-                options.update({option[0]: " ".join(option[1:])})
-            elif option[0] == "units":
-                options.update({"measurement_system": option[1]})
-            elif option[0] == "api_key":
-                options.update({"api_key": option[1]})
+        super().__init__(config)
+
+    @staticmethod
+    def parse(tempyrc: list) -> dict:
+        config = {}
+        for line in tempyrc:
+            line = line.strip()
+            if len(line) > 0 and line.startswith("#"):
+                continue
+
+            line = [val.strip().lower() for val in line.split("=")]
+            if line[0] in VALID_OPTIONS:
+                config[line[0]] = line[1]
 
         for option in VALID_OPTIONS:
-            if option not in options.keys():
-                options.update({option: ""})
+            if option not in config.keys():
+                config[option] = ""
 
-        super().__init__(options)
+        return config
 
 
 class Args(dict):
@@ -44,40 +50,24 @@ class Args(dict):
         description="Beautifully render current and near future weather data to your terminal",
     )
 
-    def save_config(self):
-        with open(TEMPYRC, "r") as f:
-            tempyrc = f.read()
-        for option in self:
-            if self[option] and option in VALID_OPTIONS:
-                new = f"{option}={self[option]}"
-                tempyrc = re.sub(f"{option}\S*", new, tempyrc)
-        with open(TEMPYRC, "w") as f:
-            f.write(tempyrc)
-
     def __init__(self):
         self.parser.add_argument(
             "location",
             nargs="*",
             help="Input a city name or US/UK/Canadian postal code",
         )
-        self.parser.add_argument("-u", "--units", dest="measurement_system", default="")
+        self.parser.add_argument("-u", "--units", dest="units", default="")
         self.parser.add_argument("-k", "--key", dest="api_key", default="")
-        self.parser.add_argument(
-            "-s", "--save", dest="save", action="store_true", default=False
-        )
 
         args = self.parser.parse_args()
         args.location = " ".join(args.location)
         super().__init__(
             {
                 "location": args.location,
-                "measurement_system": args.measurement_system,
+                "units": args.units,
                 "api_key": args.api_key,
             }
         )
-
-        if args.save is True:
-            self.save_config()
 
 
 class Config(dict):
@@ -95,7 +85,7 @@ class Config(dict):
                 f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {Args.parser.usage}"
             )
             quit()
-        if not config["measurement_system"]:
-            config["measurement_system"] = "imperial"
+        if not config["units"]:
+            config["units"] = "imperial"
 
         return config
