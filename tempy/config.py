@@ -99,11 +99,3 @@ class Config(dict):
             config["measurement_system"] = "imperial"
 
         return config
-
-
-if __name__ == "__main__":
-    try:
-        config = Config()
-    except Exception:
-        if Exception is not SystemExit:
-            console.print_exception(show_locals=True)
