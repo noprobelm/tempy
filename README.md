@@ -24,6 +24,11 @@ For Arch users, install the `tempy-git` package from the AUR
 
 ![demo](demo.png)
 
+## Configuration
+
+The first time you run `tempy`, a skeleton configuration file will be created in `$HOME/.config/tempyrc`.
+
+`location`, `units`, and `api_key` can be specified. With `tempyrc` configured, you can generate a weather report simply by running `tempy` in your terminal.
 
 ## <a name='api-key-registry'></a> OPTIONAL: Register your own API key
 
