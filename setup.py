@@ -1,7 +1,7 @@
 import pathlib
 from setuptools import setup
 
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __author__ = "Jeff Barfield"
 __author_email__ = "noprobelm@protonmail.com"
 
@@ -24,7 +24,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     packages=["tempy"],
-    package_data={"": ["assets/*.txt"]},
+    package_data={"": ["assets/*.txt", "tempyrc"]},
     include_package_data=True,
     install_requires=["requests", "rich"],
     entry_points={"console_scripts": ["tempy=tempy.__main__:main"]},

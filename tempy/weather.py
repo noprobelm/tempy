@@ -67,7 +67,7 @@ class WeatherTable:
 class Report:
     def __init__(self, config: Config) -> None:
         self.data = Data(config["location"], config["api_key"])
-        self.measurement_system = config["measurement_system"]
+        self.units = config["units"]
 
     @property
     def location(self) -> Text:
@@ -100,7 +100,7 @@ class Report:
 
     @property
     def weather_table(self) -> WeatherTable:
-        if self.measurement_system == "imperial":
+        if self.units == "imperial":
             weather_table = WeatherTable(
                 title="Current Conditions", **self.data["weather"]["imperial"]
             )
@@ -114,7 +114,7 @@ class Report:
     @property
     def forecast_tables(self) -> List[WeatherTable]:
         forecast = self.data["forecast"]
-        if self.measurement_system == "imperial":
+        if self.units == "imperial":
             forecast_tables = [
                 WeatherTable(title="Today's Forecast", **forecast[0]["imperial"])
             ]
