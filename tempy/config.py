@@ -5,7 +5,7 @@ import argparse
 VALID_OPTIONS = "location", "units", "api_key"
 
 if os.name == "nt":
-    TEMPYRC = f"{os.path.expanduser('~')}\\AppData\\Roaming"
+    TEMPYRC = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
 else:
     TEMPYRC = f"{os.path.expanduser('~')}/.config/tempyrc"
 
