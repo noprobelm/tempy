@@ -3,7 +3,11 @@ from pathlib import Path
 import argparse
 
 VALID_OPTIONS = "location", "units", "api_key"
-TEMPYRC = f"{os.path.expanduser('~')}/.config/tempyrc"
+
+if os.name == "nt":
+    TEMPYRC = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
+else:
+    TEMPYRC = f"{os.path.expanduser('~')}/.config/tempyrc"
 
 
 class TempyRC(dict):

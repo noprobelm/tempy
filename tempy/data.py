@@ -27,11 +27,10 @@ class Data(dict):
             else:
                 data = response.json()
 
+        localtime = datetime.strptime(data["location"]["localtime"], "%Y-%m-%d %H:%M")
         localdata = {
             "location": f"{data['location']['name']}, {data['location']['region']}",
-            "localtime": datetime.strptime(
-                data["location"]["localtime"], "%Y-%m-%d %H:%M"
-            ).strftime("%A, %B %-d | %H:%M"),
+            "localtime": f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}",
         }
         weather = {
             "condition": data["current"]["condition"]["text"],
@@ -63,14 +62,13 @@ class Data(dict):
         forecast = []
         for num, day in enumerate(data["forecast"]["forecastday"]):
             selected = day["day"]
+            localtime = datetime.strptime(
+                data["location"]["localtime"], "%Y-%m-%d %H:%M"
+            ) + timedelta(days=num)
+
             forecast.append(
                 {
-                    "date": (
-                        datetime.strptime(
-                            data["location"]["localtime"], "%Y-%m-%d %H:%M"
-                        )
-                        + timedelta(days=num)
-                    ).strftime("%A, %B %-d"),
+                    "date": f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}",
                     "imperial": {
                         "average": f"{selected['avgtemp_f']}°F",
                         "low": f"{selected['mintemp_f']}°F",
