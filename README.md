@@ -8,13 +8,11 @@
 
 ## Installation
 
-You can install `tempy` using `pip`
-
 ```
 pip install git+https://github.com/noprobelm/tempy
 ```
 
-For Arch users, install the `tempy-git` package from the AUR 
+`tempy` is also available as `tempy-git` on the AUR.
 
 ## Usage
 
