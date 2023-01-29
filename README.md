@@ -18,9 +18,9 @@ For Arch users, install the `tempy-git` package from the AUR
 
 ## Usage
 
-- Use `tempy new york city` to get the current weather for New York City
+- Use `tempy nyc` to get the current weather for New York City
 
-- Units are imperial by default. Specify the unit system you desire with the `-u` or `--units` flags: `tempy new york city -u metric` 
+- Units are imperial by default. Specify the unit system you desire with the `-u` or `--units` flags: `tempy nyc -u metric` 
 
 ![demo](demo.png)
 
