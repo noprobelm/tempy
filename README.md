@@ -28,7 +28,7 @@ For Arch users, install the `tempy-git` package from the AUR
 
 The `tempy` runs, a skeleton configuration file will be created in `$HOME/.config/tempyrc`. You can specify `location`, `units`, and `api_key` options in this file to make `tempy` run on a default set of arguments. 
 
-## <a name='api-key-registry'></a> OPTIONAL: Register your own API key
+## <a name='api-key-registry'></a> OPTIONAL: Registering your own API key
 
 By default, `tempy` makes requests to the [https://www.weatherapi.com](https://www.weatherapi.com/) API endpoint via my proxy server at [http://www.noprobelm.dev](http://www.noprobelm.dev). This is to prevent you from needing to register your own API key. 
 
