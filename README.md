@@ -24,7 +24,7 @@ pip install git+https://github.com/noprobelm/tempy
 
 ## Configuration
 
-The `tempy` runs, a skeleton configuration file will be created in `$HOME/.config/tempyrc`. You can specify `location`, `units`, and `api_key` options in this file to make `tempy` run on a default set of arguments. 
+When `tempy` runs, a skeleton configuration file will be created in `$HOME/.config/tempyrc`. You can specify `location`, `units`, and `api_key` options in this file to make `tempy` run on a default set of arguments. 
 
 ## <a name='api-key-registry'></a> OPTIONAL: Registering your own API key
 
