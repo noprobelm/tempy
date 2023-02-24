@@ -68,7 +68,7 @@ class Data(dict):
 
             forecast.append(
                 {
-                    "date": f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}",
+                    "date": f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}",
                     "imperial": {
                         "average": f"{selected['avgtemp_f']}°F",
                         "low": f"{selected['mintemp_f']}°F",
