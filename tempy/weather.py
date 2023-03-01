@@ -167,30 +167,29 @@ class Report:
         )
 
         future = Table(
-            Column("1"),
-            Column("2"),
+            Column("1", justify="left"),
+            Column("2", justify="right"),
+            show_edge=False,
+            show_lines=False,
             box=None,
             show_header=False,
-            width=console.measure(today).maximum,
+            padding=0,
         )
+        future.width = console.measure(today).maximum
         future.add_row(
-            Align(
-                Panel.fit(
-                    forecast_tables[1],
-                    padding=(0, 1, 0, 1),
-                    box=box.HEAVY,
-                    style=Default.panel_border_style,
-                ),
-                "center",
+            Panel(
+                Align(forecast_tables[1], "center"),
+                box=box.HEAVY,
+                style=Default.panel_border_style,
+                width=(future.width // 2 - 1),
             ),
-            Align(
-                Panel.fit(
-                    forecast_tables[2],
-                    padding=(0, 1, 0, 1),
-                    box=box.HEAVY,
-                    style=Default.panel_border_style,
-                ),
-                "center",
+            Panel(
+                Align(forecast_tables[2], "center"),
+                box=box.HEAVY,
+                style=Default.panel_border_style,
+                width=(future.width // 2 + 1)
+                if future.width % 2 == 1
+                else future.width // 2,
             ),
         )
         yield today
