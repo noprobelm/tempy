@@ -13,7 +13,7 @@ class Data(dict):
     def __init__(self, location: str, api_key: Union[str, None]):
         if api_key:
             data = requests.get(
-                f"{self.api_endpoint}?key={api_key}&q={location}&days=3&awi=yes"
+                f"{self.api_endpoint}?key={api_key}&q={location}&days=3&aqi=yes&alerts=yes"
             ).json()
         else:
             response = requests.get(
@@ -26,6 +26,10 @@ class Data(dict):
                 quit()
             else:
                 data = response.json()
+
+        if "error" in data.keys():
+            print(f"tempy: '{location}': {data['error']['message']} Please try again")
+            quit()
 
         localtime = datetime.strptime(data["location"]["localtime"], "%Y-%m-%d %H:%M")
         localdata = {
