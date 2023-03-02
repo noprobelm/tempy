@@ -12,13 +12,9 @@ class Data(dict):
 
     def __init__(self, location: str, api_key: Union[str, None]):
         if api_key:
-            data = requests.get(
-                f"{self.api_endpoint}?key={api_key}&q={location}&days=3&awi=yes"
-            ).json()
+            data = requests.get(f"{self.api_endpoint}?key={api_key}&q={location}&days=3&awi=yes").json()
         else:
-            response = requests.get(
-                f"{self.proxy_server}", headers={"location": location}
-            )
+            response = requests.get(f"{self.proxy_server}", headers={"location": location})
             if response.status_code == 429:
                 console.print(
                     "Rate limit exceeded. Try again in a few minutes.\nIf you feel the rate limit is too strict, create an issue at github.com/noprobelm/tempy"
@@ -26,6 +22,10 @@ class Data(dict):
                 quit()
             else:
                 data = response.json()
+
+        if "error" in data.keys():
+            print(f"tempy: '{location}': {data['error']['message']} Please try again")
+            quit()
 
         localtime = datetime.strptime(data["location"]["localtime"], "%Y-%m-%d %H:%M")
         localdata = {
@@ -62,9 +62,7 @@ class Data(dict):
         forecast = []
         for num, day in enumerate(data["forecast"]["forecastday"]):
             selected = day["day"]
-            localtime = datetime.strptime(
-                data["location"]["localtime"], "%Y-%m-%d %H:%M"
-            ) + timedelta(days=num)
+            localtime = datetime.strptime(data["location"]["localtime"], "%Y-%m-%d %H:%M") + timedelta(days=num)
 
             forecast.append(
                 {
@@ -94,6 +92,4 @@ class Data(dict):
                 }
             )
 
-        super().__init__(
-            {"localdata": localdata, "weather": weather, "forecast": forecast}
-        )
+        super().__init__({"localdata": localdata, "weather": weather, "forecast": forecast})
