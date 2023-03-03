@@ -28,7 +28,9 @@ class Data(dict):
                 data = response.json()
 
         if "error" in data.keys():
-            print(f"tempy: '{location}': {data['error']['message']} Please try again")
+            console.print(
+                f"tempy: '{location}': {data['error']['message']} Please try again"
+            )
             quit()
 
         localtime = datetime.strptime(data["location"]["localtime"], "%Y-%m-%d %H:%M")
