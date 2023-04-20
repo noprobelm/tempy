@@ -16,3 +16,6 @@ requests = "^2.28.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+tempy = 'tempy.__main__:main'
