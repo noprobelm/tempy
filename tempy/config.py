@@ -18,6 +18,9 @@ class TempyRC(dict):
 
         except FileNotFoundError:
             parent = Path(__file__).parent
+            CONFIGDIR = os.path.join(Path(os.path.expanduser("~")), ".config")
+            if not os.path.isdir(CONFIGDIR) and os.name == "posix":
+                os.mkdir(CONFIGDIR)
             skel = f"{parent}/tempyrc"
             with open(skel, "r") as f:
                 skel = f.read()
