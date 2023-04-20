@@ -18,7 +18,7 @@ class TempyRC(dict):
 
         except FileNotFoundError:
             parent = Path(__file__).parent
-            if not os.path.isdir(parent):
+            if not os.path.isdir(parent) and os.name != "nt":
                 os.mkdir(parent)
             skel = f"{parent}/tempyrc"
             with open(skel, "r") as f:
