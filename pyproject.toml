@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "tempy"
+version = "1.2.1"
+description = "Render weather data beautifully to your terminal"
+authors = ["noprobelm <noprobelm@protonmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+rich = "^13.3.4"
+requests = "^2.28.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+tempy = 'tempy.__main__:main'
