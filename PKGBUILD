@@ -1,6 +1,6 @@
 # Maintainer: noprobelm@protonmail.com
 pkgname=tempy-git
-pkgver=1.0.r28.eff6685
+pkgver=1.0.r67.a44e372
 pkgrel=1
 pkgdesc="Render visually pleasing weather reports as rich text to your terminal"
 arch=(any)
@@ -8,7 +8,7 @@ url="https://github.com/noprobelm/tempy.git"
 license=('MIT')
 groups=()
 depends=(python-rich python-requests)
-makedepends=(git python-setuptools python-build python-installer python-wheel)
+makedepends=(git python-setuptools python-build python-installer python-wheel python-poetry-core)
 optdepends=()
 provides=(tempy)
 conflicts=()
@@ -23,12 +23,12 @@ md5sums=('SKIP') #autofill using updpkgsums
 
 pkgver() {
     cd "$pkgname"
-    printf "1.0.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+    printf "1.2.1.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 build() {
     cd tempy-git
-    python -m build --wheel --no-isolation
+    /usr/bin/python3 -m build --wheel --no-isolation
 }
 
 package() {
