@@ -1,6 +1,5 @@
 import requests
 from datetime import datetime, timedelta
-from typing import Union
 from .console import console
 
 
