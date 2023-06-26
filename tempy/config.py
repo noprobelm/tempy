@@ -36,6 +36,7 @@ class TempyRC(dict):
                     os.mkdir(tempyrc_parent_path)
                 except FileNotFoundError:
                     print(f"Invalid config path '{tempyrc_parent_path}'")
+                    sys.exit()
 
             skel_path = os.path.join(Path(__file__).parent, "tempyrc")
             with open(skel_path, "r") as f:
@@ -64,6 +65,8 @@ class TempyRC(dict):
 
 
 class Args(dict):
+    """Stores configuration information for tempy from the tempyrc file in the user's config path"""
+
     def __init__(self, unparsed: list[str]) -> None:
         parser = argparse.ArgumentParser(
             prog="tempy",
