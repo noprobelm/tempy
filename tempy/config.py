@@ -147,12 +147,12 @@ class Config(dict):
         else:
             config_dir = f"{os.path.expanduser('~')}/.config/tempyrc"
 
-        tempyrc = TempyRC(config_dir)
-        args = Args(sys.argv[1:])
+        self.tempyrc = TempyRC(config_dir)
+        self.args = Args(sys.argv[1:])
         config = {}
 
         for option in VALID_OPTIONS:
-            config[option] = args[option] or tempyrc[option]
+            config[option] = self.args[option] or self.tempyrc[option]
 
         if not config["location"]:
             print(
