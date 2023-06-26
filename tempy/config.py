@@ -22,7 +22,6 @@ class TempyRC(dict):
 
         Args:
             tempyrc_path (str): The path of tempyrc (usually ~/.tempyrc/config)
-
         """
 
         tempyrc_path = Path(tempyrc_path)
