@@ -146,7 +146,7 @@ class Config(dict):
             print(
                 f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {args.usage}"
             )
-            quit()
+            sys.exit()
 
         if not config["units"]:
             config["units"] = "imperial"
