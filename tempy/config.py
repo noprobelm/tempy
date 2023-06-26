@@ -81,10 +81,8 @@ class Config(dict):
     def __init__(self):
         tempyrc = TempyRC()
         args = Args()
-        super().__init__(self.set_config(tempyrc, args))
-
-    def set_config(self, tempyrc, args):
         config = {}
+
         for option in VALID_OPTIONS:
             config[option] = args[option] or tempyrc[option]
         if not config["location"]:
@@ -95,4 +93,4 @@ class Config(dict):
         if not config["units"]:
             config["units"] = "imperial"
 
-        return config
+        super().__init__(config)
