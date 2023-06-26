@@ -4,11 +4,11 @@ from pathlib import Path
 import argparse
 from typing import Union
 
+VALID_OPTIONS = "location", "units", "api_key"
+
 
 class TempyRC(dict):
     """Stores configuration information for tempy from the tempyrc file in the user's config path"""
-
-    VALID_OPTIONS = "location", "units", "api_key"
 
     def __init__(self, tempyrc_path: Union[Path, str]) -> None:
         """Inits TempyRC with specified config file path
@@ -44,7 +44,7 @@ class TempyRC(dict):
             with open(tempyrc_path, "w") as f:
                 f.write(skel)
 
-            config = {option: "" for option in self.VALID_OPTIONS}
+            config = {option: "" for option in VALID_OPTIONS}
 
         else:
             config = {}
@@ -54,10 +54,10 @@ class TempyRC(dict):
                     continue
 
                 line = [val.strip().lower() for val in line.split("=")]
-                if line[0] in self.VALID_OPTIONS:
+                if line[0] in VALID_OPTIONS:
                     config[line[0]] = line[1]
 
-            for option in self.VALID_OPTIONS:
+            for option in VALID_OPTIONS:
                 if option not in config.keys():
                     config[option] = ""
 
@@ -104,7 +104,7 @@ class Config(dict):
         args = Args(sys.argv[1:])
         config = {}
 
-        for option in TempyRC.VALID_OPTIONS:
+        for option in VALID_OPTIONS:
             config[option] = args[option] or tempyrc[option]
 
         if not config["location"]:
