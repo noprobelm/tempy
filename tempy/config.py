@@ -14,7 +14,7 @@ class TempyRC(dict):
     def __init__(self):
         try:
             with open(TEMPYRC, "r") as f:
-                config = self.parse(f.readlines())
+                tempyrc = f.readlines()
 
         except FileNotFoundError:
             parent = Path(__file__).parent
@@ -26,28 +26,25 @@ class TempyRC(dict):
                 skel = f.read()
             with open(TEMPYRC, "w") as f:
                 f.write(skel)
-            super().__init__({option: "" for option in VALID_OPTIONS})
-            return
+
+            config = {option: "" for option in VALID_OPTIONS}
+
+        else:
+            config = {}
+            for line in tempyrc:
+                line = line.strip()
+                if len(line) > 0 and line.startswith("#"):
+                    continue
+
+                line = [val.strip().lower() for val in line.split("=")]
+                if line[0] in VALID_OPTIONS:
+                    config[line[0]] = line[1]
+
+            for option in VALID_OPTIONS:
+                if option not in config.keys():
+                    config[option] = ""
 
         super().__init__(config)
-
-    @staticmethod
-    def parse(tempyrc: list) -> dict:
-        config = {}
-        for line in tempyrc:
-            line = line.strip()
-            if len(line) > 0 and line.startswith("#"):
-                continue
-
-            line = [val.strip().lower() for val in line.split("=")]
-            if line[0] in VALID_OPTIONS:
-                config[line[0]] = line[1]
-
-        for option in VALID_OPTIONS:
-            if option not in config.keys():
-                config[option] = ""
-
-        return config
 
 
 class Args(dict):
