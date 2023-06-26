@@ -39,6 +39,7 @@ class TempyRC(dict):
                     sys.exit()
 
             skel_path = os.path.join(Path(__file__).parent, "tempyrc")
+
             with open(skel_path, "r") as f:
                 skel = f.read()
             with open(tempyrc_path, "w") as f:
