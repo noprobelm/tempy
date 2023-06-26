@@ -48,22 +48,22 @@ class TempyRC(dict):
 
 
 class Args(dict):
-    parser = argparse.ArgumentParser(
-        prog="tempy",
-        usage="tempy <location> <optional args>",
-        description="Render current and near future weather data as rich text to your terminal",
-    )
-
     def __init__(self):
-        self.parser.add_argument(
+        parser = argparse.ArgumentParser(
+            prog="tempy",
+            usage="tempy <location> <optional args>",
+            description="Render current and near future weather data as rich text to your terminal",
+        )
+
+        parser.add_argument(
             "location",
             nargs="*",
             help="Input a city name or US/UK/Canadian postal code",
         )
-        self.parser.add_argument("-u", "--units", dest="units", default="")
-        self.parser.add_argument("-k", "--key", dest="api_key", default="")
+        parser.add_argument("-u", "--units", dest="units", default="")
+        parser.add_argument("-k", "--key", dest="api_key", default="")
 
-        args = self.parser.parse_args()
+        args = parser.parse_args()
         args.location = " ".join(args.location)
         super().__init__(
             {
