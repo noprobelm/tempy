@@ -10,7 +10,7 @@ class Data(dict):
     # Request the actual endpoint if an API key is detected
     api_endpoint = "https://api.weatherapi.com/v1/forecast.json"
 
-    def __init__(self, location: str, api_key: Union[str, None]):
+    def __init__(self, location: str, api_key: str):
         if api_key:
             data = requests.get(
                 f"{self.api_endpoint}?key={api_key}&q={location}&days=3&aqi=yes&alerts=yes"
