@@ -146,6 +146,12 @@ class Config(dict):
             3. api_key (str): The API key to use. If no API key is passed, use http://noprobelm.dev
 
 
+        Args:
+            1. tempyrc_path (Optional[Union[Path, str, None]]): Path to use for TempyRC. Default will use user config
+               path (~/.config for Linux)
+            2. unparsed (Optional[Union[list[str], None]]) : Unparsed command line args to use for Args. Default will
+               use sys.argv[1:]
+
         TODO:
             - Add robust testing for Windows configurations. I don't have the infrastructure to adequately test this at
               the moment
