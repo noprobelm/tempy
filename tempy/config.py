@@ -6,7 +6,7 @@ import argparse
 class TempyRC(dict):
     VALID_OPTIONS = "location", "units", "api_key"
 
-    def __init__(self, tempyrc_path: str):
+    def __init__(self, tempyrc_path: str) -> None:
         try:
             with open(tempyrc_path, "r") as f:
                 tempyrc = f.readlines()
@@ -42,7 +42,7 @@ class TempyRC(dict):
 
 
 class Args(dict):
-    def __init__(self):
+    def __init__(self) -> None:
         parser = argparse.ArgumentParser(
             prog="tempy",
             usage="tempy <location> <optional args>",
@@ -71,7 +71,7 @@ class Args(dict):
 
 
 class Config(dict):
-    def __init__(self):
+    def __init__(self) -> None:
         if os.name == "nt":
             config_dir = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
         else:
