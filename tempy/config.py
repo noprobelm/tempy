@@ -66,9 +66,20 @@ class TempyRC(dict):
 
 
 class Args(dict):
-    """Stores configuration information for tempy from the tempyrc file in the user's config path"""
+    """Stores configuration information for tempy from the tempyrc file in the user's config path
+
+    Attributes:
+        1. usage (str): Holds the ArgumentParser instance's usage str
+    """
 
     def __init__(self, unparsed: list[str]) -> None:
+        """Creates instance of TempyRC with specified config file path
+
+        Args:
+            1. unparsed (list[str]): A list of the arguments to parse (e.g. sys.argv[1:])
+
+        """
+
         parser = argparse.ArgumentParser(
             prog="tempy",
             usage="tempy <location> <optional args>",
