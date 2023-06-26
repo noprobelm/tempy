@@ -1,0 +1,7 @@
+# tempyrc: default values tempy will use when generating a weather report. You can use one, all,
+# or none of the valid config options. If using all, simply run 'tempy' to generate your report.
+
+# Example config below
+
+location=nyc
+units=imperial
