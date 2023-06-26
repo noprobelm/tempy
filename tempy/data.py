@@ -1,15 +1,47 @@
+import sys
 import requests
 from datetime import datetime, timedelta
 from .console import console
+from typing import Optional
 
 
 class Data(dict):
-    # Backup in case the user doesn't want to get their own API key.
-    proxy_server = "http://noprobelm.dev:80"
-    # Request the actual endpoint if an API key is detected
-    api_endpoint = "https://api.weatherapi.com/v1/forecast.json"
+    """Stores the raw weather report data for specified location and units
 
-    def __init__(self, location: str, api_key: str):
+    Attributes:
+        1. proxy_server (str): The proxy server to forward requests through
+        2. api_endpoint (str): The api endpoint to use if an api key is provided
+
+    """
+
+    def __init__(self, location: str, api_key: Optional[str] = ""):
+        """Initializes an instance of the Data class
+
+        Reaches out to either the proxy server our weatherapi (depending on if API key is present). The resulting json
+        is then parsed to meet the needs of the weather.Report class.
+
+        Args:
+            1. location (str): The location to request weather information for (can be city, state/province, zip code)
+            2. api_key (Optional[str]): Optional API key to bypass proxy server
+
+        Keys:
+            - localdata (dict): A dict of the localdata parsed from the HTTP resonse
+                - location (str): The requested location
+                - localtime (str): A datetime str parsed to meet the needs of the weather.Report class
+            - weather (dict): A dict of the current weather data parsed from the HTTP response
+                - condition (str): str of the current weather conditions (e.g. "sunny")
+                - is_day (int): 0 or 1 representing daytime (1) or nighttime (0)
+                - imperial (dict[str, str]): The full weather report in imperial format
+                - metric (dict[str, str]): The full weather report in metric format
+            - forecast (list[dict]): A list of dicts containing daily forecast data. Each day:
+                - date (str): A datetime str parsed to emet the needs of the weather.Report class.
+                - imperial (dict[str, str]): The full forecast report in imperial format
+                - metric (dict[str, str]): The full forecast report in metric format
+
+        """
+        self.proxy_server = "http://noprobelm.dev:80"
+        self.api_endpoint = "https://api.weatherapi.com/v1/forecast.json"
+
         if api_key:
             data = requests.get(
                 f"{self.api_endpoint}?key={api_key}&q={location}&days=3&aqi=yes&alerts=yes"
@@ -30,7 +62,7 @@ class Data(dict):
             console.print(
                 f"tempy: '{location}': {data['error']['message']} Please try again"
             )
-            quit()
+            sys.exit()
 
         localtime = datetime.strptime(data["location"]["localtime"], "%Y-%m-%d %H:%M")
         localdata = {
