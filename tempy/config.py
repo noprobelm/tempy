@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 
 VALID_OPTIONS = "location", "units", "api_key"
 
@@ -127,7 +127,11 @@ class Config(dict):
         _args (Args): Args sourced from cmdline args for priority comparison
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        tempyrc_path: Optional[Union[Path, str, None]] = None,
+        unparsed: Optional[Union[list[str], None]] = None,
+    ) -> None:
         """Creates instance of TempyRC with specified config file path
 
         This is a convenience class used to select config data between command line args and the tempyrc
@@ -147,13 +151,17 @@ class Config(dict):
               the moment
         """
 
-        if os.name == "nt":
-            config_dir = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
-        else:
-            config_dir = f"{os.path.expanduser('~')}/.config/tempyrc"
+        if tempyrc_path is None:
+            if os.name == "nt":
+                tempyrc_path = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
+            else:
+                tempyrc_path = f"{os.path.expanduser('~')}/.config/tempyrc"
 
-        self._tempyrc = TempyRC(config_dir)
-        self._args = Args(sys.argv[1:])
+        self._tempyrc = TempyRC(tempyrc_path)
+
+        if unparsed is None:
+            self._args = Args(sys.argv[1:])
+
         config = {}
 
         for option in VALID_OPTIONS:
