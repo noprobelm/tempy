@@ -12,6 +12,7 @@ class TempyRC(dict):
 
     Attributes:
         1. path (Path): The path of tempyrc
+
     """
 
     def __init__(self, path: Union[Path, str]) -> None:
