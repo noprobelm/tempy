@@ -56,6 +56,8 @@ class Args(dict):
             description="Render current and near future weather data as rich text to your terminal",
         )
 
+        self.usage = parser.usage
+
         parser.add_argument(
             "location",
             nargs="*",
@@ -86,7 +88,7 @@ class Config(dict):
 
         if not config["location"]:
             print(
-                f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {Args.parser.usage}"
+                f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {args.usage}"
             )
             quit()
         if not config["units"]:
