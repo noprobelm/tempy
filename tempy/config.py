@@ -104,7 +104,6 @@ class Args(dict):
             "--units",
             dest="units",
             choices=["imperial", "metric"],
-            default="imperial",
         )
         parser.add_argument("-k", "--key", dest="api_key", default="")
 
