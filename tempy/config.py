@@ -108,7 +108,28 @@ class Args(dict):
 
 
 class Config(dict):
+    """Stores the final configuration information to be used by weather.Report"""
+
     def __init__(self) -> None:
+        """Creates instance of TempyRC with specified config file path
+
+        This is a convenience class used to select config data between command line args and the tempyrc
+
+        Priority order:
+            1. Args config
+            2. TempyRC config
+
+        Config keys:
+            1. location (str): The location to fetch weather data for
+            2. units (str): The measurement system to use (imperial or metric)
+            3. api_key (str): The API key to use. If no API key is passed, use http://noprobelm.dev
+
+
+        TODO:
+            - Add robust testing for Windows configurations. I don't have the infrastructure to adequately test this at
+              the moment
+        """
+
         if os.name == "nt":
             config_dir = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
         else:
@@ -126,6 +147,7 @@ class Config(dict):
                 f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {args.usage}"
             )
             quit()
+
         if not config["units"]:
             config["units"] = "imperial"
 
