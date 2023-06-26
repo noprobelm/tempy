@@ -10,7 +10,7 @@ VALID_OPTIONS = "location", "units", "api_key"
 class TempyRC(dict):
     """Stores configuration information for tempy from the tempyrc file in the user's config path"""
 
-    def __init__(self, tempyrc_path: Union[Path, str]) -> None:
+    def __init__(self, path: Union[Path, str]) -> None:
         """Creates instance of TempyRC with specified config file path
 
         1. If the tempyrc provided is found:
@@ -24,14 +24,14 @@ class TempyRC(dict):
             tempyrc_path (str): The path of tempyrc (usually ~/.tempyrc/config)
         """
 
-        tempyrc_path = Path(tempyrc_path)
+        self.path = Path(path)
 
         try:
-            with open(tempyrc_path, "r") as f:
+            with open(self.path, "r") as f:
                 tempyrc = f.readlines()
 
         except FileNotFoundError:
-            tempyrc_parent_path = tempyrc_path.parent
+            tempyrc_parent_path = self.path.parent
             if not os.path.isdir(tempyrc_parent_path) and os.name == "posix":
                 try:
                     os.mkdir(tempyrc_parent_path)
@@ -43,7 +43,7 @@ class TempyRC(dict):
 
             with open(skel_path, "r") as f:
                 skel = f.read()
-            with open(tempyrc_path, "w") as f:
+            with open(self.path, "w") as f:
                 f.write(skel)
 
             config = {option: "" for option in VALID_OPTIONS}
