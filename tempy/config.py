@@ -99,7 +99,13 @@ class Args(dict):
             nargs="*",
             help="Input a city name or US/UK/Canadian postal code",
         )
-        parser.add_argument("-u", "--units", dest="units", default="")
+        parser.add_argument(
+            "-u",
+            "--units",
+            dest="units",
+            choices=["imperial", "metric"],
+            default="imperial",
+        )
         parser.add_argument("-k", "--key", dest="api_key", default="")
 
         parsed = parser.parse_args(args=unparsed)
