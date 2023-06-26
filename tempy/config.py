@@ -1,7 +1,7 @@
+import argparse
 import os
 import sys
 from pathlib import Path
-import argparse
 from typing import Union
 
 VALID_OPTIONS = "location", "units", "api_key"
