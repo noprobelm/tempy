@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 import argparse
 
-VALID_OPTIONS = "location", "units", "api_key"
 
 if os.name == "nt":
     TEMPYRC = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
@@ -11,6 +10,8 @@ else:
 
 
 class TempyRC(dict):
+    VALID_OPTIONS = "location", "units", "api_key"
+
     def __init__(self):
         try:
             with open(TEMPYRC, "r") as f:
@@ -27,7 +28,7 @@ class TempyRC(dict):
             with open(TEMPYRC, "w") as f:
                 f.write(skel)
 
-            config = {option: "" for option in VALID_OPTIONS}
+            config = {option: "" for option in self.VALID_OPTIONS}
 
         else:
             config = {}
@@ -37,10 +38,10 @@ class TempyRC(dict):
                     continue
 
                 line = [val.strip().lower() for val in line.split("=")]
-                if line[0] in VALID_OPTIONS:
+                if line[0] in self.VALID_OPTIONS:
                     config[line[0]] = line[1]
 
-            for option in VALID_OPTIONS:
+            for option in self.VALID_OPTIONS:
                 if option not in config.keys():
                     config[option] = ""
 
@@ -80,8 +81,9 @@ class Config(dict):
         args = Args()
         config = {}
 
-        for option in VALID_OPTIONS:
+        for option in TempyRC.VALID_OPTIONS:
             config[option] = args[option] or tempyrc[option]
+
         if not config["location"]:
             print(
                 f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {Args.parser.usage}"
