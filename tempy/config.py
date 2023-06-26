@@ -167,6 +167,8 @@ class Config(dict):
 
         if unparsed is None:
             self._args = Args(sys.argv[1:])
+        else:
+            self._args = Args(unparsed)
 
         config = {}
 
