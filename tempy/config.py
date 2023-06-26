@@ -54,7 +54,7 @@ class Args(dict):
     parser = argparse.ArgumentParser(
         prog="tempy",
         usage="tempy <location> <optional args>",
-        description="Beautifully render current and near future weather data to your terminal",
+        description="Render current and near future weather data as rich text to your terminal",
     )
 
     def __init__(self):
