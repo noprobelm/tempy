@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 import argparse
 
@@ -42,7 +43,7 @@ class TempyRC(dict):
 
 
 class Args(dict):
-    def __init__(self) -> None:
+    def __init__(self, unparsed: list[str]) -> None:
         parser = argparse.ArgumentParser(
             prog="tempy",
             usage="tempy <location> <optional args>",
@@ -59,13 +60,13 @@ class Args(dict):
         parser.add_argument("-u", "--units", dest="units", default="")
         parser.add_argument("-k", "--key", dest="api_key", default="")
 
-        args = parser.parse_args()
-        args.location = " ".join(args.location)
+        parsed = parser.parse_args(args=unparsed)
+        parsed.location = " ".join(parsed.location)
         super().__init__(
             {
-                "location": args.location,
-                "units": args.units,
-                "api_key": args.api_key,
+                "location": parsed.location,
+                "units": parsed.units,
+                "api_key": parsed.api_key,
             }
         )
 
@@ -78,7 +79,7 @@ class Config(dict):
             config_dir = f"{os.path.expanduser('~')}/.config/tempyrc"
 
         tempyrc = TempyRC(config_dir)
-        args = Args()
+        args = Args(sys.argv[1:])
         config = {}
 
         for option in TempyRC.VALID_OPTIONS:
