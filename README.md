@@ -32,10 +32,6 @@ By default, `tempy` makes requests to the [https://www.weatherapi.com](https://w
 
 If you'd rather not make requests through my server, you can always register your own key for free in minutes at [www.weatherapi.com](https://www.weatherapi.com/). Just store your key in `$HOME/.config/tempyrc` and `tempy` will take care of the rest. 
 
-# Credits
-
-- Credit due to [Will McGugan](https://github.com/willmcgugan) and the team at [textualize](https://www.textualize.io/) for creating such a wonderfully robust tool for rendering rich text to the terminal using Python.
-
 # License
 
 Copyright © 2023 Jeff Barfield.
