@@ -25,6 +25,7 @@ class TempyRC(dict):
         """
 
         tempyrc_path = Path(tempyrc_path)
+
         try:
             with open(tempyrc_path, "r") as f:
                 tempyrc = f.readlines()
