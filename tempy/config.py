@@ -11,7 +11,7 @@ class TempyRC(dict):
     """Stores configuration information for tempy from the tempyrc file in the user's config path"""
 
     def __init__(self, tempyrc_path: Union[Path, str]) -> None:
-        """Inits TempyRC with specified config file path
+        """Creates instance of TempyRC with specified config file path
 
         1. If the tempyrc provided is found:
             a. Parse the contents, ignoring lines that start with '#'
