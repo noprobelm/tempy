@@ -120,7 +120,12 @@ class Args(dict):
 
 
 class Config(dict):
-    """Stores the final configuration information to be used by weather.Report"""
+    """Stores the final configuration information to be used by weather.Report
+
+    Attributes:
+        _tempyrc (TempyRC): TempyRC for priority comparison
+        _args (Args): Args sourced from cmdline args for priority comparison
+    """
 
     def __init__(self) -> None:
         """Creates instance of TempyRC with specified config file path
