@@ -42,6 +42,16 @@ class Data(dict):
         self.proxy_server = "http://noprobelm.dev:80"
         self.api_endpoint = "https://api.weatherapi.com/v1/forecast.json"
 
+        data = self._request_data(location, api_key)
+        localdata = self._parse_localdata(data)
+        weather = self._parse_weather(data)
+        forecast = self._parse_forecast(data)
+
+        super().__init__(
+            {"localdata": localdata, "weather": weather, "forecast": forecast}
+        )
+
+    def _request_data(self, location: str, api_key: str):
         if api_key:
             data = requests.get(
                 f"{self.api_endpoint}?key={api_key}&q={location}&days=3&aqi=yes&alerts=yes"
@@ -64,11 +74,18 @@ class Data(dict):
             )
             sys.exit()
 
+        return data
+
+    def _parse_localdata(self, data: dict):
         localtime = datetime.strptime(data["location"]["localtime"], "%Y-%m-%d %H:%M")
         localdata = {
             "location": f"{data['location']['name']}, {data['location']['region']}",
             "localtime": f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}",
         }
+
+        return localdata
+
+    def _parse_weather(self, data: dict):
         weather = {
             "condition": data["current"]["condition"]["text"],
             "is_day": data["current"]["is_day"],
@@ -95,7 +112,9 @@ class Data(dict):
                 "UV index": f"{data['current']['uv']}",
             },
         }
+        return weather
 
+    def _parse_forecast(self, data: dict) -> list[dict]:
         forecast = []
         for num, day in enumerate(data["forecast"]["forecastday"]):
             selected = day["day"]
@@ -131,6 +150,4 @@ class Data(dict):
                 }
             )
 
-        super().__init__(
-            {"localdata": localdata, "weather": weather, "forecast": forecast}
-        )
+        return forecast
