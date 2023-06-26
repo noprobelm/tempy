@@ -177,7 +177,7 @@ class Config(dict):
 
         if not config["location"]:
             print(
-                f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {args.usage}"
+                f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {self._args.usage}"
             )
             sys.exit()
 
