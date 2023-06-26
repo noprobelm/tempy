@@ -5,9 +5,24 @@ import argparse
 
 
 class TempyRC(dict):
+    """Stores configuration information for tempy from the tempyrc file in the user's config path"""
+
     VALID_OPTIONS = "location", "units", "api_key"
 
     def __init__(self, tempyrc_path: str) -> None:
+        """Inits TempyRC with specified config file path
+
+        1. If the tempyrc provided is found:
+            a. Parse the contents, ignoring lines that start with '#'
+        2. If no tempyrc is found:
+            a. If the tempyrc path's parent is ~/.config and ~/.config does not exist, create it
+            b. If tempyrc does not exist, create one from the skel
+        3. Init dict superclass with tempyrc contents
+
+        Args:
+            tempyrc_path (str): The path of tempyrc (usually ~/.tempyrc/config)
+
+        """
         try:
             with open(tempyrc_path, "r") as f:
                 tempyrc = f.readlines()
