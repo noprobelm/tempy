@@ -9,8 +9,8 @@ class Data(dict):
     """Stores the raw weather report data for specified location and units
 
     Attributes:
-        1. proxy_server (str): The proxy server to forward requests through
-        2. api_endpoint (str): The api endpoint to use if an api key is provided
+        1. _proxy_server (str): The proxy server to forward requests through
+        2. _api_endpoint (str): The api endpoint to use if an api key is provided
 
     """
 
@@ -39,8 +39,8 @@ class Data(dict):
                 - metric (dict[str, str]): The full forecast report in metric format
 
         """
-        self.proxy_server = "http://noprobelm.dev:80"
-        self.api_endpoint = "https://api.weatherapi.com/v1/forecast.json"
+        self._proxy_server = "http://noprobelm.dev:80"
+        self._api_endpoint = "https://api.weatherapi.com/v1/forecast.json"
 
         data = self._request_data(location, api_key)
         localdata = self._parse_localdata(data)
@@ -51,14 +51,27 @@ class Data(dict):
             {"localdata": localdata, "weather": weather, "forecast": forecast}
         )
 
-    def _request_data(self, location: str, api_key: str):
+    def _request_data(self, location: str, api_key: Optional[str] = ""):
+        """Requests weather data as json for specified location
+
+        This method will request weather data either through a proxy server or directly to weatherapi (if an API key is
+        provided). Logic is in place to ensure excessive requests are not made to the http server. If the json response
+        has an error, it wll be printed and tempy will terminate.
+
+        Args
+            1. location (str): The location str to pass as header in http request
+            2. api_key (Optional[str]): api_key to use. Default is "", which will cause a request to a proxy server
+
+        Returns
+            - data (dict): The http json response
+        """
         if api_key:
             data = requests.get(
-                f"{self.api_endpoint}?key={api_key}&q={location}&days=3&aqi=yes&alerts=yes"
+                f"{self._api_endpoint}?key={api_key}&q={location}&days=3&aqi=yes&alerts=yes"
             ).json()
         else:
             response = requests.get(
-                f"{self.proxy_server}", headers={"location": location}
+                f"{self._proxy_server}", headers={"location": location}
             )
             if response.status_code == 429:
                 console.print(
@@ -77,6 +90,15 @@ class Data(dict):
         return data
 
     def _parse_localdata(self, data: dict):
+        """Parses the localdata of the http json response
+
+        Args:
+            1. data (dict): The http json response
+
+        Returns:
+            - localdata (dict): The localdata associated with the weather report
+        """
+
         localtime = datetime.strptime(data["location"]["localtime"], "%Y-%m-%d %H:%M")
         localdata = {
             "location": f"{data['location']['name']}, {data['location']['region']}",
@@ -86,6 +108,15 @@ class Data(dict):
         return localdata
 
     def _parse_weather(self, data: dict):
+        """Parses the current weather data of the http json response
+
+        Args:
+            1. data (dict): The http json response
+
+        Returns:
+            - weather (dict): The current weather information
+        """
+
         weather = {
             "condition": data["current"]["condition"]["text"],
             "is_day": data["current"]["is_day"],
@@ -115,6 +146,14 @@ class Data(dict):
         return weather
 
     def _parse_forecast(self, data: dict) -> list[dict]:
+        """Parses the forecast data from http json response
+
+        Args:
+            1. data (dict): The http json response
+
+        Returns:
+            - forecast (list[dict]): A list of dicts containing forecast information for each day
+        """
         forecast = []
         for num, day in enumerate(data["forecast"]["forecastday"]):
             selected = day["day"]
