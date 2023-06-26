@@ -3,29 +3,22 @@ from pathlib import Path
 import argparse
 
 
-if os.name == "nt":
-    TEMPYRC = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
-else:
-    TEMPYRC = f"{os.path.expanduser('~')}/.config/tempyrc"
-
-
 class TempyRC(dict):
     VALID_OPTIONS = "location", "units", "api_key"
 
-    def __init__(self):
+    def __init__(self, tempyrc_path: str):
         try:
-            with open(TEMPYRC, "r") as f:
+            with open(tempyrc_path, "r") as f:
                 tempyrc = f.readlines()
 
         except FileNotFoundError:
-            parent = Path(__file__).parent
-            CONFIGDIR = os.path.join(Path(os.path.expanduser("~")), ".config")
-            if not os.path.isdir(CONFIGDIR) and os.name == "posix":
-                os.mkdir(CONFIGDIR)
-            skel = f"{parent}/tempyrc"
-            with open(skel, "r") as f:
+            skel_path = os.path.join(Path(__file__).parent, "tempyrc")
+            user_config_path = os.path.join(Path(os.path.expanduser("~")), ".config")
+            if not os.path.isdir(user_config_path) and os.name == "posix":
+                os.mkdir(user_config_path)
+            with open(skel_path, "r") as f:
                 skel = f.read()
-            with open(TEMPYRC, "w") as f:
+            with open(tempyrc_path, "w") as f:
                 f.write(skel)
 
             config = {option: "" for option in self.VALID_OPTIONS}
@@ -79,7 +72,12 @@ class Args(dict):
 
 class Config(dict):
     def __init__(self):
-        tempyrc = TempyRC()
+        if os.name == "nt":
+            config_dir = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
+        else:
+            config_dir = f"{os.path.expanduser('~')}/.config/tempyrc"
+
+        tempyrc = TempyRC(config_dir)
         args = Args()
         config = {}
 
