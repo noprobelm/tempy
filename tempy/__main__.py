@@ -5,8 +5,8 @@ from .console import console
 
 def main():
     config = Config()
-    renderable = Report(config)
-    console.print(renderable)
+    report = Report(config["location"], config["units"], config["api_key"])
+    console.print(report)
 
 
 if __name__ == "__main__":
