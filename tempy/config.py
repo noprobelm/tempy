@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 import argparse
+from typing import Union
 
 
 class TempyRC(dict):
@@ -9,13 +10,13 @@ class TempyRC(dict):
 
     VALID_OPTIONS = "location", "units", "api_key"
 
-    def __init__(self, tempyrc_path: str) -> None:
+    def __init__(self, tempyrc_path: Union[Path, str]) -> None:
         """Inits TempyRC with specified config file path
 
         1. If the tempyrc provided is found:
             a. Parse the contents, ignoring lines that start with '#'
         2. If no tempyrc is found:
-            a. If the tempyrc path's parent is ~/.config and ~/.config does not exist, create it
+            a. If the tempyrc parent path does not exist, create it
             b. If tempyrc does not exist, create one from the skel
         3. Init dict superclass with tempyrc contents
 
@@ -23,15 +24,21 @@ class TempyRC(dict):
             tempyrc_path (str): The path of tempyrc (usually ~/.tempyrc/config)
 
         """
+
+        tempyrc_path = Path(tempyrc_path)
         try:
             with open(tempyrc_path, "r") as f:
                 tempyrc = f.readlines()
 
         except FileNotFoundError:
+            tempyrc_parent_path = tempyrc_path.parent
+            if not os.path.isdir(tempyrc_parent_path) and os.name == "posix":
+                try:
+                    os.mkdir(tempyrc_parent_path)
+                except FileNotFoundError:
+                    print(f"Invalid config path '{tempyrc_parent_path}'")
+
             skel_path = os.path.join(Path(__file__).parent, "tempyrc")
-            user_config_path = os.path.join(Path(os.path.expanduser("~")), ".config")
-            if not os.path.isdir(user_config_path) and os.name == "posix":
-                os.mkdir(user_config_path)
             with open(skel_path, "r") as f:
                 skel = f.read()
             with open(tempyrc_path, "w") as f:
