@@ -8,7 +8,11 @@ VALID_OPTIONS = "location", "units", "api_key"
 
 
 class TempyRC(dict):
-    """Stores configuration information for tempy from the tempyrc file in the user's config path"""
+    """Stores configuration information for tempy from the tempyrc file in the user's config path
+
+    Attributes:
+        1. path (Path): The path of tempyrc
+    """
 
     def __init__(self, path: Union[Path, str]) -> None:
         """Creates instance of TempyRC with specified config file path
@@ -21,7 +25,7 @@ class TempyRC(dict):
         3. Init dict superclass with tempyrc contents
 
         Args:
-            tempyrc_path (str): The path of tempyrc (usually ~/.tempyrc/config)
+            path (str): The path of tempyrc (usually ~/.tempyrc/config)
         """
 
         self.path = Path(path)
