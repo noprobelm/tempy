@@ -10,7 +10,6 @@ from rich import box
 from .console import console
 from .themes import Default
 from .data import Data
-from .config import Config
 
 
 class WeatherTable:
