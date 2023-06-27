@@ -68,7 +68,7 @@ def _():
     tempyrc_path = os.path.join(parent_path, "tempyrc")
     assert os.path.isdir(parent_path) == False
 
-    tempyrc = config.TempyRC(os.path.join(parent_path, "tempyrc"))
+    config.TempyRC(os.path.join(parent_path, "tempyrc"))
     assert os.path.isdir(parent_path) == True
     assert os.path.isfile(tempyrc_path) == True
 
