@@ -5,21 +5,28 @@ import shutil
 import os
 
 
-@test("Config will instantiate with no arguments")
+@test("Config will instantiate with no command line arguments")
 def _():
-    tempy_config = config.Config()
+    tempyrc_path = "sample_tempyrcs/location_units_api"
+
+    unparsed = []
+    tempy_config = config.Config(tempyrc_path, unparsed)
     assert isinstance(tempy_config, config.Config)
 
 
 @test("A valid config.TempyRC was parsed")
 def _():
-    tempy_config = config.Config()
+    tempyrc_path = "sample_tempyrcs/location_units_api"
+
+    tempy_config = config.Config(tempyrc_path)
     assert all(key in tempy_config._tempyrc for key in config.VALID_OPTIONS)
 
 
 @test("A valid config.Args was parsed")
 def _():
-    tempy_config = config.Config()
+    unparsed = ["nyc"]
+
+    tempy_config = config.Config(unparsed=unparsed)
     assert all(key in tempy_config._args for key in config.VALID_OPTIONS)
 
 
