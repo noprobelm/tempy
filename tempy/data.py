@@ -42,7 +42,7 @@ class Data(dict):
         self._proxy_server = "http://noprobelm.dev:80"
         self._api_endpoint = "https://api.weatherapi.com/v1/forecast.json"
 
-        data = self._request_data(location, api_key)
+        data = self._request(location, api_key)
         localdata = self._parse_localdata(data)
         weather = self._parse_weather(data)
         forecast = self._parse_forecast(data)
@@ -51,7 +51,7 @@ class Data(dict):
             {"localdata": localdata, "weather": weather, "forecast": forecast}
         )
 
-    def _request_data(self, location: str, api_key: Optional[str] = ""):
+    def _request(self, location: str, api_key: Optional[str] = ""):
         """Requests weather data as json for specified location
 
         This method will request weather data either through a proxy server or directly to weatherapi (if an API key is
