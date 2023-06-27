@@ -1,8 +1,5 @@
 from tempy import config
 from ward import test, raises
-from pathlib import Path
-import shutil
-import os
 
 
 @test("Config will instantiate with no command line arguments")
