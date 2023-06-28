@@ -52,7 +52,7 @@ class TempyRC(dict):
 
         super().__init__(parsed)
 
-    def _copy_skel(self, path: Path):
+    def _copy_skel(self, path: Path) -> None:
         """Copy tempyrc skel to user config path
 
         For posix users:
