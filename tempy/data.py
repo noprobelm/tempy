@@ -1,8 +1,10 @@
 import sys
-import requests
 from datetime import datetime, timedelta
-from .console import console
 from typing import Optional
+
+import requests
+
+from .console import console
 
 
 class Data(dict):

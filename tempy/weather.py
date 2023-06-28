@@ -1,15 +1,18 @@
 from pathlib import Path
-from typing import Optional, Union, List
-from rich.align import Align
-from rich.rule import Rule
-from rich.console import Console, ConsoleOptions, Measurement, Group, RenderResult
-from rich.text import Text
-from rich.panel import Panel
-from rich.table import Table, Column
+from typing import List, Optional, Union
+
 from rich import box
+from rich.align import Align
+from rich.console import (Console, ConsoleOptions, Group, Measurement,
+                          RenderResult)
+from rich.panel import Panel
+from rich.rule import Rule
+from rich.table import Column, Table
+from rich.text import Text
+
 from .console import console
-from .themes import Default
 from .data import Data
+from .themes import Default
 
 
 class WeatherTable:

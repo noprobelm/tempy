@@ -1,6 +1,6 @@
 from .config import Config
-from .weather import Report
 from .console import console
+from .weather import Report
 
 
 def main():
