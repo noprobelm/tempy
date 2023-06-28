@@ -23,7 +23,7 @@ class TempyRC(dict):
             a. Parse the contents
             b. Fill in empty key/value pairs; delete erroneous key/value pairs
         2. If no tempyrc is found:
-            a. If the tempyrc parent path does not exist, create it
+            a. If the tempyrc parent path does not exist, attempt to create it
             b. If tempyrc does not exist, create one from the skel
         3. Init dict superclass with tempyrc contents
 
