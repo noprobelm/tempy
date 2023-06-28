@@ -21,7 +21,7 @@ tempyrc_permutations = {
 
 for fname in tempyrc_permutations:
 
-    @test("All possible permutation of tempyrc are parsed")
+    @test(f"Sample tempyrc file '{fname}' parses to {tempyrc_permutations[fname]}")
     def _():
         with open(f"sample_tempyrcs/{fname}", "r") as fp:
             parsed = parse_rc(fp)
