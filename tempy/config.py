@@ -53,12 +53,17 @@ class TempyRC(dict):
         super().__init__(parsed)
 
     def _copy_skel(self, path: Path):
+        """Copy tempyrc skel to user config path"""
         tempyrc_parent_path = path.parent
-        if not os.path.isdir(tempyrc_parent_path) and os.name == "posix":
-            try:
-                os.mkdir(tempyrc_parent_path)
-            except FileNotFoundError:
-                print(f"Invalid config path '{tempyrc_parent_path}'")
+        if not os.path.isdir(tempyrc_parent_path):
+            if os.name == "posix":
+                try:
+                    os.mkdir(tempyrc_parent_path)
+                except FileNotFoundError:
+                    print(f"No such path: '{tempyrc_parent_path}'")
+                    sys.exit()
+            elif os.name == "nt":
+                print(f"No such path: '{tempyrc_parent_path}'")
                 sys.exit()
 
         skel_path = os.path.join(Path(__file__).parent, "tempyrc")
