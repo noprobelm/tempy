@@ -20,7 +20,8 @@ class TempyRC(dict):
         """Creates instance of TempyRC with specified config file path
 
         1. If the tempyrc provided is found:
-            a. Parse the contents, ignoring lines that start with '#'
+            a. Parse the contents
+            b. Fill in empty key/value pairs; delete erroneous key/value pairs
         2. If no tempyrc is found:
             a. If the tempyrc parent path does not exist, create it
             b. If tempyrc does not exist, create one from the skel
