@@ -15,7 +15,6 @@ tempyrc_permutations = {
     "units": {"location": "", "units": "imperial", "api_key": ""},
     "location_api": {
         "location": "nyc",
-        "units": "",
         "api_key": "jlskdjfaklejaeglkw",
     },
 }
