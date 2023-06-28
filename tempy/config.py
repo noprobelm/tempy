@@ -53,18 +53,26 @@ class TempyRC(dict):
         super().__init__(parsed)
 
     def _copy_skel(self, path: Path):
-        """Copy tempyrc skel to user config path"""
+        """Copy tempyrc skel to user config path
+
+        For posix users:
+            - If the specified configuration path (usually ~/.config) does not exist, create it.
+            - If the parent of the specified configuration path does not exist, terminate tempy to avoid recursive path
+              creation
+
+        For Windows users:
+            - If the specified configuration path does not exist, warn the user and terminate.
+        """
+
         tempyrc_parent_path = path.parent
         if not os.path.isdir(tempyrc_parent_path):
             if os.name == "posix":
                 try:
                     os.mkdir(tempyrc_parent_path)
                 except FileNotFoundError:
-                    print(f"No such path: '{tempyrc_parent_path}'")
-                    sys.exit()
+                    sys.exit(f"No such path: '{tempyrc_parent_path.parent}'")
             elif os.name == "nt":
-                print(f"No such path: '{tempyrc_parent_path}'")
-                sys.exit()
+                sys.exit(f"No such path: '{tempyrc_parent_path}'")
 
         skel_path = os.path.join(Path(__file__).parent, "tempyrc")
 
