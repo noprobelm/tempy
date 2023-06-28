@@ -3,6 +3,7 @@ import os
 import sys
 from pathlib import Path
 from typing import Union, Optional
+from .parser import parse_rc
 
 VALID_OPTIONS = "location", "units", "api_key"
 
@@ -29,46 +30,42 @@ class TempyRC(dict):
             path (str): The path of tempyrc (usually ~/.tempyrc/config)
         """
 
-        self.path = Path(path)
+        path = Path(path)
 
         try:
-            with open(self.path, "r") as f:
-                tempyrc = f.readlines()
+            with open(path, "r") as fp:
+                parsed = parse_rc(fp)
 
         except FileNotFoundError:
-            tempyrc_parent_path = self.path.parent
-            if not os.path.isdir(tempyrc_parent_path) and os.name == "posix":
-                try:
-                    os.mkdir(tempyrc_parent_path)
-                except FileNotFoundError:
-                    print(f"Invalid config path '{tempyrc_parent_path}'")
-                    sys.exit()
-
-            skel_path = os.path.join(Path(__file__).parent, "tempyrc")
-
-            with open(skel_path, "r") as f:
-                skel = f.read()
-            with open(self.path, "w") as f:
-                f.write(skel)
-
-            config = {option: "" for option in VALID_OPTIONS}
+            self._copy_skel(path)
+            parsed = {option: "" for option in VALID_OPTIONS}
 
         else:
-            config = {}
-            for line in tempyrc:
-                line = line.strip()
-                if len(line) > 0 and line.startswith("#"):
-                    continue
-
-                line = [val.strip().lower() for val in line.split("=")]
-                if line[0] in VALID_OPTIONS:
-                    config[line[0]] = line[1]
-
             for option in VALID_OPTIONS:
-                if option not in config.keys():
-                    config[option] = ""
+                if option not in parsed.keys():
+                    parsed[option] = ""
 
-        super().__init__(config)
+            for option in parsed:
+                if option not in VALID_OPTIONS:
+                    del parsed[option]
+
+        super().__init__(parsed)
+
+    def _copy_skel(self, path: Path):
+        tempyrc_parent_path = path.parent
+        if not os.path.isdir(tempyrc_parent_path) and os.name == "posix":
+            try:
+                os.mkdir(tempyrc_parent_path)
+            except FileNotFoundError:
+                print(f"Invalid config path '{tempyrc_parent_path}'")
+                sys.exit()
+
+        skel_path = os.path.join(Path(__file__).parent, "tempyrc")
+
+        with open(skel_path, "r") as f:
+            skel = f.read()
+        with open(path, "w") as f:
+            f.write(skel)
 
 
 class Args(dict):
@@ -154,6 +151,7 @@ class Config(dict):
         TODO:
             - Add robust testing for Windows configurations. I don't have the infrastructure to adequately test this at
               the moment
+            - Rewrite args to accept tempyrc instead of path
         """
 
         if tempyrc_path is None:
