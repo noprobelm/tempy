@@ -175,9 +175,7 @@ class Config(dict):
         super().__init__(config)
 
     @classmethod
-    def from_unparsed(
-        cls, tempyrc_path: Union[Path, str], unparsed: list[str]
-    ) -> "Config":
+    def from_default(cls) -> "Config":
         """Constructor method to instantiate a Config object from a tempyrc path and sys.argv
 
         Args:
@@ -190,11 +188,12 @@ class Config(dict):
             Config: An instance of self based on a tempyrc path and sys.argv[1:]
         """
 
-        tempyrc = TempyRC(tempyrc_path)
-
-        if unparsed is None:
-            args = Args(sys.argv[1:])
+        if os.name == "nt":
+            tempyrc_path = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
         else:
-            args = Args(unparsed)
+            tempyrc_path = f"{os.path.expanduser('~')}/.config/tempyrc"
+
+        tempyrc = TempyRC(tempyrc_path)
+        args = Args(sys.argv[1:])
 
         return cls(tempyrc, args)
