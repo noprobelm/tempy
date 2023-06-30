@@ -10,12 +10,7 @@ VALID_OPTIONS = "location", "units", "api_key"
 
 
 class TempyRC(dict):
-    """Stores configuration information for tempy from the tempyrc file in the user's config path
-
-    Attributes:
-        1. path (Path): The path of tempyrc
-
-    """
+    """Stores configuration information for tempy from the tempyrc file in the user's config path"""
 
     def __init__(self, path: Union[Path, str]) -> None:
         """Creates instance of TempyRC with specified config file path
@@ -138,11 +133,7 @@ class Config(dict):
         _args (Args): Args sourced from cmdline args for priority comparison
     """
 
-    def __init__(
-        self,
-        tempyrc_path: Optional[Union[Path, str, None]] = None,
-        unparsed: Optional[Union[list[str], None]] = None,
-    ) -> None:
+    def __init__(self, tempyrc: TempyRC, args: Args) -> None:
         """Creates instance of TempyRC with specified config file path
 
         This is a convenience class used to select config data between command line args and the tempyrc
@@ -158,9 +149,8 @@ class Config(dict):
 
 
         Args:
-            1. tempyrc_path (Optional[Union[Path, str, None]]): Path to use for TempyRC. Default will use user config
-               path (~/.config for Linux)
-            2. unparsed (Optional[Union[list[str], None]]) : Unparsed command line args to use for Args. Default will
+            1. tempyrc (Union[TempyRC, None]): The TempyRC to compare
+            2. unparsed (Union[Args, None]]) : Unparsed command line args to use for Args. Default will
                use sys.argv[1:]
 
         TODO:
@@ -169,27 +159,14 @@ class Config(dict):
             - Rewrite args to accept tempyrc instead of path
         """
 
-        if tempyrc_path is None:
-            if os.name == "nt":
-                tempyrc_path = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
-            else:
-                tempyrc_path = f"{os.path.expanduser('~')}/.config/tempyrc"
-
-        self._tempyrc = TempyRC(tempyrc_path)
-
-        if unparsed is None:
-            self._args = Args(sys.argv[1:])
-        else:
-            self._args = Args(unparsed)
-
         config = {}
 
         for option in VALID_OPTIONS:
-            config[option] = self._args[option] or self._tempyrc[option]
+            config[option] = args[option] or tempyrc[option]
 
         if not config["location"]:
             print(
-                f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {self._args.usage}"
+                f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {args.usage}"
             )
             sys.exit()
 
@@ -197,3 +174,26 @@ class Config(dict):
             config["units"] = "imperial"
 
         super().__init__(config)
+
+    @classmethod
+    def from_cli(cls, tempyrc_path: Union[Path, str], unparsed: list[str]) -> "Config":
+        """Constructor method to instantiate a Config object from a tempyrc path and sys.argv
+
+        Args:
+            1. tempyrc_path (Optional[Union[Path, str, None]]): Path to use for TempyRC. Default will use user config
+               path (~/.config for Linux)
+            2. unparsed (Optional[Union[list[str], None]]) : Unparsed command line args to use for Args. Default will
+               use sys.argv[1:]
+
+        Returns:
+            Config: An instance of self based on a tempyrc path and sys.argv[1:]
+        """
+
+        tempyrc = TempyRC(tempyrc_path)
+
+        if unparsed is None:
+            args = Args(sys.argv[1:])
+        else:
+            args = Args(unparsed)
+
+        return cls(tempyrc, args)
