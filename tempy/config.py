@@ -156,7 +156,6 @@ class Config(dict):
         TODO:
             - Add robust testing for Windows configurations. I don't have the infrastructure to adequately test this at
               the moment
-            - Rewrite args to accept tempyrc instead of path
         """
 
         config = {}
