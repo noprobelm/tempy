@@ -10,7 +10,7 @@ def _():
     assert "173.255.235.176" == socket.gethostbyname(data.Data._proxy_domain)
 
 
-@test("Request weatherapi returns valid data")
+@test("Request to weatherapi returns valid data")
 def _():
     tempyrc = config.TempyRC(
         os.path.join(os.path.expanduser("~"), ".config/tempyrc_test")
