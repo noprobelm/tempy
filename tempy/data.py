@@ -11,16 +11,23 @@ class Data(dict):
     """Stores the raw weather report data for specified location and units
 
     Attributes:
-        1. _proxy_server (str): The proxy server to forward requests through
-        2. _api_endpoint (str): The api endpoint to use if an api key is provided
+        1. _proxy_domain (str): The domain name of the proxy server to forward requests to
+        2. _proxy_port (int): The port of the proxy server to forward requests to
+        3. _proxy_endpoint (str): The full URL of the proxy server to forward requests to
+        4. _api_endpoint (str): The full url of the api endpoint to use if an api key is provided
+        5. _location (str): The location to target for the weather report
 
     """
+
+    _proxy_domain = "noprobelm.dev"
+    _proxy_port = 80
+    _api_endpoint = "https://api.weatherapi.com/v1"
 
     def __init__(self, location: str, api_key: Optional[str] = ""):
         """Initializes an instance of the Data class
 
-        Reaches out to either the proxy server our weatherapi (depending on if API key is present). The resulting json
-        is then parsed to meet the needs of the weather.Report class.
+        Reaches out to either the proxy server or weatherapi (depending on if API key is present). The resulting json
+        is then formatted/parsed/simplified for rendering.
 
         Args:
             1. location (str): The location to request weather information for (can be city, state/province, zip code)
@@ -41,10 +48,12 @@ class Data(dict):
                 - metric (dict[str, str]): The full forecast report in metric format
 
         """
-        self._proxy_server = "http://noprobelm.dev:80"
-        self._api_endpoint = "https://api.weatherapi.com/v1/forecast.json"
 
-        data = self._request(location, api_key)
+        self._proxy_endpoint = f"http://{Data._proxy_domain}:{Data._proxy_port}"
+        self._location = location
+
+        data = self._request_api(api_key) if api_key else self._request_proxy()
+
         localdata = self._parse_localdata(data)
         weather = self._parse_weather(data)
         forecast = self._parse_forecast(data)
@@ -53,43 +62,60 @@ class Data(dict):
             {"localdata": localdata, "weather": weather, "forecast": forecast}
         )
 
-    def _request(self, location: str, api_key: Optional[str] = ""):
-        """Requests weather data as json for specified location
+    def _request_proxy(self) -> dict:
+        """Send weather report request to the proxy server
 
-        This method will request weather data either through a proxy server or directly to weatherapi (if an API key is
-        provided). Logic is in place to ensure excessive requests are not made to the http server. If the json response
-        has an error, it wll be printed and tempy will terminate.
+        This method is used if no API key is provided.
 
-        Args
-            1. location (str): The location str to pass as header in http request
-            2. api_key (Optional[str]): api_key to use. Default is "", which will cause a request to a proxy server
+        Returns:
+            data (dict): The unparsed weather report data
 
-        Returns
-            - data (dict): The http json response
         """
-        if api_key:
-            data = requests.get(
-                f"{self._api_endpoint}?key={api_key}&q={location}&days=3&aqi=yes&alerts=yes"
-            ).json()
-        else:
-            response = requests.get(
-                f"{self._proxy_server}", headers={"location": location}
-            )
-            if response.status_code == 429:
-                console.print(
-                    "Rate limit exceeded. Try again in a few minutes.\nIf you feel the rate limit is too strict, create an issue at github.com/noprobelm/tempy"
-                )
-                quit()
-            else:
-                data = response.json()
+        response = requests.get(
+            f"{self._proxy_endpoint}", headers={"location": self._location}
+        )
 
-        if "error" in data.keys():
-            console.print(
-                f"tempy: '{location}': {data['error']['message']} Please try again"
-            )
-            sys.exit()
+        data = response.json()
+        self._validate_data(data)
 
         return data
+
+    def _request_api(self, api_key: str) -> dict:
+        """Send weather report request to the API endpoint
+
+        This method is used if an API key is provided.
+
+        Args:
+            api_key (str): The alphanumeric API key to use
+
+        Returns:
+            data (dict): The unparsed weather report data
+
+        """
+        response = requests.get(
+            f"{self._api_endpoint}/forecast.json?key={api_key}&q={self._location}&days=3&aqi=yes&alerts=yes"
+        )
+
+        data = response.json()
+        self._validate_data(data)
+
+        return data
+
+    def _validate_data(self, data: dict) -> None:
+        """Validates the http json response
+
+        Checks to see if the http json response contains an 'error' key. If so, something went wrong.
+
+        TODO:
+            - Explore and account for additional errors. Currently we're only accounting for invalid location
+              (which is the most probable outcome since we've received a 200 response at this point).
+
+        """
+        if "error" in data.keys():
+            console.print(
+                f"tempy: '{self._location}': {data['error']['message']} Please try again"
+            )
+            sys.exit()
 
     def _parse_localdata(self, data: dict):
         """Parses the localdata of the http json response
