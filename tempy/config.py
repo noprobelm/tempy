@@ -175,7 +175,9 @@ class Config(dict):
         super().__init__(config)
 
     @classmethod
-    def from_cli(cls, tempyrc_path: Union[Path, str], unparsed: list[str]) -> "Config":
+    def from_unparsed(
+        cls, tempyrc_path: Union[Path, str], unparsed: list[str]
+    ) -> "Config":
         """Constructor method to instantiate a Config object from a tempyrc path and sys.argv
 
         Args:

@@ -12,7 +12,7 @@ def main():
     else:
         tempyrc_path = f"{os.path.expanduser('~')}/.config/tempyrc"
 
-    config = Config.from_cli(tempyrc_path=tempyrc_path, unparsed=sys.argv[1:])
+    config = Config.from_unparsed(tempyrc_path=tempyrc_path, unparsed=sys.argv[1:])
     report = Report(config["location"], config["units"], config["api_key"])
     console.print(report)
 
