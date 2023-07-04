@@ -53,57 +53,6 @@ class Weather:
         yield table
 
 
-class WeatherTable:
-    def __init__(self, title: Optional[Union[Text, str]] = None, **table_data):
-        self.title = title
-        for label in table_data:
-            table_data[label] = str(table_data[label])
-            setattr(self, label, table_data[label])
-        self.renderable = table_data
-
-    @property
-    def renderable(self) -> Table:
-        return self._renderable
-
-    @renderable.setter
-    def renderable(self, table_data: dict) -> None:
-        labels = Column(
-            "labels",
-            width=max([len(label) for label in table_data.keys()]),
-            no_wrap=True,
-            style=Default.information,
-        )
-        values = Column(
-            "values",
-            width=max([len(str(value)) for value in table_data.values()]),
-            no_wrap=True,
-            style=Default.information,
-        )
-        self._renderable = Table(
-            labels,
-            values,
-            show_edge=False,
-            expand=False,
-            show_header=False,
-            title_style=Default.table_header,
-            border_style=Default.table_divider,
-        )
-        if self.title:
-            self._renderable.title = f"{self.title}\n"
-        for label in table_data:
-            self._renderable.add_row(label.title(), table_data[label])
-
-    def __rich_console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
-        yield self.renderable
-
-    def __rich_measure__(
-        self, console: Console, options: ConsoleOptions
-    ) -> Measurement:
-        return console.measure(self.renderable)
-
-
 class Report:
     def __init__(self, location: str, units: str, api_key: str) -> None:
         self.data = Data(location, api_key)
@@ -139,36 +88,36 @@ class Report:
         return art
 
     @property
-    def weather_table(self) -> WeatherTable:
+    def weather_table(self) -> Weather:
         if self.units == "imperial":
-            weather_table = WeatherTable(
-                title="Current Conditions", **self.data["weather"]["imperial"]
+            weather_table = Weather(
+                title="Current Conditions\n", **self.data["weather"]["imperial"]
             )
         else:
-            weather_table = WeatherTable(
-                title="Current Conditions", **self.data["weather"]["metric"]
+            weather_table = Weather(
+                title="Current Conditions\n", **self.data["weather"]["metric"]
             )
 
         return weather_table
 
     @property
-    def forecast_tables(self) -> List[WeatherTable]:
+    def forecast_tables(self) -> List[Weather]:
         forecast = self.data["forecast"]
         if self.units == "imperial":
             forecast_tables = [
-                WeatherTable(title="Today's Forecast", **forecast[0]["imperial"])
+                Weather(title="Today's Forecast\n", **forecast[0]["imperial"])
             ]
             for data in forecast[1:]:
                 forecast_tables.append(
-                    WeatherTable(title=data["date"], **data["imperial"])
+                    Weather(title=f"{data['date']}\n", **data["imperial"])
                 )
         else:
             forecast_tables = [
-                WeatherTable(title="Today's Forecast", **forecast[0]["metric"])
+                Weather(title="Today's Forecast\n", **forecast[0]["metric"])
             ]
             for data in forecast[1:]:
                 forecast_tables.append(
-                    WeatherTable(title=data["date"], **data["metric"])
+                    WeatherTable(title=f"{data['date']}\n", **data["metric"])
                 )
 
         return forecast_tables
