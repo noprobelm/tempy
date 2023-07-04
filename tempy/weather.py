@@ -13,6 +13,45 @@ from .console import console
 from .data import Data
 from .themes import Default
 
+from dataclasses import dataclass
+
+
+@dataclass
+class Weather:
+    title: str
+    weather: dict
+
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
+        labels = Column(
+            "labels",
+            width=max([len(label) for label in self.weather.keys()]),
+            no_wrap=True,
+            style=Default.information,
+        )
+        values = Column(
+            "values",
+            width=max([len(str(value)) for value in self.weather.values()]),
+            no_wrap=True,
+            style=Default.information,
+        )
+        table = Table(
+            labels,
+            values,
+            show_edge=False,
+            expand=False,
+            show_header=False,
+            title_style=Default.table_header,
+            border_style=Default.table_divider,
+        )
+
+        table.title = f"{self.title}\n"
+        for label in self.weather:
+            table.add_row(label.title(), self.weather[label])
+
+        yield table
+
 
 class WeatherTable:
     def __init__(self, title: Optional[Union[Text, str]] = None, **table_data):
@@ -54,10 +93,14 @@ class WeatherTable:
         for label in table_data:
             self._renderable.add_row(label.title(), table_data[label])
 
-    def __rich_console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         yield self.renderable
 
-    def __rich_measure__(self, console: Console, options: ConsoleOptions) -> Measurement:
+    def __rich_measure__(
+        self, console: Console, options: ConsoleOptions
+    ) -> Measurement:
         return console.measure(self.renderable)
 
 
@@ -81,9 +124,7 @@ class Report:
         else:
             file_suffix = "night"
         parent = Path(__file__).parent.parent
-        filename = (
-            f"{parent}/tempy/assets/{self.data['weather']['condition'].replace(' ', '_')}_{file_suffix}.txt".lower()
-        )
+        filename = f"{parent}/tempy/assets/{self.data['weather']['condition'].replace(' ', '_')}_{file_suffix}.txt".lower()
         with open(filename, "r") as f:
             art = Text.from_ansi(f.read())
 
@@ -100,9 +141,13 @@ class Report:
     @property
     def weather_table(self) -> WeatherTable:
         if self.units == "imperial":
-            weather_table = WeatherTable(title="Current Conditions", **self.data["weather"]["imperial"])
+            weather_table = WeatherTable(
+                title="Current Conditions", **self.data["weather"]["imperial"]
+            )
         else:
-            weather_table = WeatherTable(title="Current Conditions", **self.data["weather"]["metric"])
+            weather_table = WeatherTable(
+                title="Current Conditions", **self.data["weather"]["metric"]
+            )
 
         return weather_table
 
@@ -110,17 +155,27 @@ class Report:
     def forecast_tables(self) -> List[WeatherTable]:
         forecast = self.data["forecast"]
         if self.units == "imperial":
-            forecast_tables = [WeatherTable(title="Today's Forecast", **forecast[0]["imperial"])]
+            forecast_tables = [
+                WeatherTable(title="Today's Forecast", **forecast[0]["imperial"])
+            ]
             for data in forecast[1:]:
-                forecast_tables.append(WeatherTable(title=data["date"], **data["imperial"]))
+                forecast_tables.append(
+                    WeatherTable(title=data["date"], **data["imperial"])
+                )
         else:
-            forecast_tables = [WeatherTable(title="Today's Forecast", **forecast[0]["metric"])]
+            forecast_tables = [
+                WeatherTable(title="Today's Forecast", **forecast[0]["metric"])
+            ]
             for data in forecast[1:]:
-                forecast_tables.append(WeatherTable(title=data["date"], **data["metric"]))
+                forecast_tables.append(
+                    WeatherTable(title=data["date"], **data["metric"])
+                )
 
         return forecast_tables
 
-    def __rich_console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         location = self.location
         localtime = self.localtime
         art = self.art
@@ -137,7 +192,9 @@ class Report:
         )
         today.add_row(Align(art, vertical="middle"), weather_table, forecast_tables[0])
         # BUG: There might be a bug in the way Panel.fit() calculates the size it needs to be for grids that have padding, hence the explicit definition below. Reminder to look into it.
-        today.width = (console.measure(today).maximum) + sum([today.padding[1], today.padding[3]])
+        today.width = (console.measure(today).maximum) + sum(
+            [today.padding[1], today.padding[3]]
+        )
         today = Panel.fit(
             Group(
                 Align(location, "center"),
@@ -170,7 +227,9 @@ class Report:
                 Align(forecast_tables[2], "center"),
                 box=box.HEAVY,
                 style=Default.panel_border_style,
-                width=(future.width // 2 + 1) if future.width % 2 == 1 else future.width // 2,
+                width=(future.width // 2 + 1)
+                if future.width % 2 == 1
+                else future.width // 2,
             ),
         )
         yield today
