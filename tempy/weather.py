@@ -91,11 +91,11 @@ class Report:
     def weather_table(self) -> Weather:
         if self.units == "imperial":
             weather_table = Weather(
-                title="Current Conditions\n", **self.data["weather"]["imperial"]
+                "Current Conditions\n", self.data["weather"]["imperial"]
             )
         else:
             weather_table = Weather(
-                title="Current Conditions\n", **self.data["weather"]["metric"]
+                "Current Conditions\n", self.data["weather"]["metric"]
             )
 
         return weather_table
@@ -104,21 +104,13 @@ class Report:
     def forecast_tables(self) -> List[Weather]:
         forecast = self.data["forecast"]
         if self.units == "imperial":
-            forecast_tables = [
-                Weather(title="Today's Forecast\n", **forecast[0]["imperial"])
-            ]
+            forecast_tables = [Weather("Today's Forecast\n", forecast[0]["imperial"])]
             for data in forecast[1:]:
-                forecast_tables.append(
-                    Weather(title=f"{data['date']}\n", **data["imperial"])
-                )
+                forecast_tables.append(Weather(f"{data['date']}\n", data["imperial"]))
         else:
-            forecast_tables = [
-                Weather(title="Today's Forecast\n", **forecast[0]["metric"])
-            ]
+            forecast_tables = [Weather("Today's Forecast\n", forecast[0]["metric"])]
             for data in forecast[1:]:
-                forecast_tables.append(
-                    WeatherTable(title=f"{data['date']}\n", **data["metric"])
-                )
+                forecast_tables.append(Weather(f"{data['date']}\n", data["metric"]))
 
         return forecast_tables
 
