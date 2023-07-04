@@ -39,7 +39,7 @@ class Data(dict):
                 - localtime (str): A datetime str parsed to meet the needs of the weather.Report class
             - weather (dict): A dict of the current weather data parsed from the HTTP response
                 - condition (str): str of the current weather conditions (e.g. "sunny")
-                - is_day (int): 0 or 1 representing daytime (1) or nighttime (0)
+                - is_day (int): bool representing day or night for current weathe report
                 - imperial (dict[str, str]): The full weather report in imperial format
                 - metric (dict[str, str]): The full weather report in metric format
             - forecast (list[dict]): A list of dicts containing daily forecast data. Each day:
@@ -147,7 +147,6 @@ class Data(dict):
 
         weather = {
             "condition": data["current"]["condition"]["text"],
-            "is_day": data["current"]["is_day"],
             "imperial": {
                 "temperature": f"{data['current']['temp_f']}°F",
                 "wind": f"{data['current']['wind_mph']} mph {data['current']['wind_dir']}",
@@ -171,6 +170,9 @@ class Data(dict):
                 "UV index": f"{data['current']['uv']}",
             },
         }
+
+        weather["is_day"] = bool(data["current"]["is_day"])
+
         return weather
 
     def _parse_forecast(self, data: dict) -> list[dict]:
