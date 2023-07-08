@@ -15,7 +15,27 @@ from .themes import Default
 
 
 class Report:
+    """A terminal-renderable weather report
+
+    Attributes:
+        1. _data (Data): The data.Data object containing weather report information retrieved from weatherapi.com or the proxy
+                  server
+        2. _imperial (bool): Indicator for whether the weather report should display imperial (True) or metric (False)
+    """
+
     def __init__(self, location: str, units: str, api_key: str) -> None:
+        """Initializes an instance of the Report class
+
+        A Data object is instantiated based on the 'location', and 'api_key' args. The _imperial bool is set
+        accordingly.
+
+        When this object is printed to the terminal using rich.console.Console, the __rich_console__ special method is
+        invoked:
+            1. The 'location' and 'localtime' data is pulled from the Data object
+            2. An ASCII art representation of the current weather conditions (and time of day) is generated
+            3. Tables containing current and forecasted conditions are generated
+            4. The weather report renderable is assembled and yielded
+        """
         self._data = Data(location, api_key)
 
         if units == "imperial":
@@ -24,6 +44,23 @@ class Report:
             self._imperial = False
 
     def _get_ascii_art(self, condition: str, is_day: bool):
+        """Gets the ASCII art corresponding to current weather conditions and time of day
+
+        Each asset follows the naming scheme: '<condition>_<day or night>.txt'. The 'condition' portion of the text file simply
+        follows the condition as returned by the API request, all lowercase with spaces replaced with underscores.
+
+        Each asset is plain text formatted using ANSII escape sequences. We use the rich.text.Text.from_ansii
+        classmethod to manage interpretation of the ANSII escape sequences.
+
+        The label is representative of the current conditions, formatted to be title text.
+
+        Args:
+            condition (str): The current weather conditions as returned by the API request
+            is_day (bool): Boolean representing whether it's currently daytime or nighttime.
+
+        Returns:
+            art (Text): The ASCII art to render to the terminal
+        """
         assets_path = os.path.join(Path(__file__).parent, "assets")
         filename = condition.replace(" ", "_").lower()
         if is_day is True:
@@ -50,6 +87,19 @@ class Report:
         return art
 
     def _get_weather_table(self, table_data: dict, title: str) -> Table:
+        """Builds a table of weather conditions for rendering to the terminal
+
+
+        In the terminal, this is the 'current conditions', 'today's forecast', and each forecast in the lower region of
+        the weather report renderable.
+
+        Args:
+            table_data (dict): A dict of the table data to use for the weather report
+            title (str): The title to place above the table
+
+        Returns:
+            table (Table): The weather table to render to the terminal
+        """
         labels = Column(
             "labels",
             width=max([len(label) for label in table_data.keys()]),
@@ -81,6 +131,27 @@ class Report:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+        """The rich console special method.
+
+        This method is called when the Report object is printed using the rich.console.Console.print method
+
+        Each element of the weather report renderable is generated separately, then assigned to upper and lower regions
+
+        - Upper report region
+            - Headers
+                - location (Text): The location to render (e.g. New York City, New York)
+                - localtime (Text): The localtime to render (e.g. Saturday, July 8 | 17:00)
+            - Report (left to right)
+                - ASCII art
+                - Current conditions
+                - Today's forecast
+
+        - Lower report region (left to right)
+            - Today + 1 day forecast table
+            - Today + 2 days forecast table
+
+        After each region of the report has been rendered, we yield the upper, then the lower.
+        """
         location = Text(
             self._data["localdata"]["location"], style=Default.report_header
         )
