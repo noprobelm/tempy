@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 
 from .config import Config
 from .console import console
