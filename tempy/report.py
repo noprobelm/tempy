@@ -21,8 +21,6 @@ class Report:
     The purpose of this class is to provide a object that can be rendered to the terminal by the rich.console.Console
     class.
 
-    This class uses the data.Data class to manage fetching the weather report data.
-
     Attributes:
         1. localtime (datetime): The localtime of the location of the weather report. This is used to generate the report
         header and forecast headers

@@ -1,10 +1,6 @@
-import os
-import sys
-
 from .config import Config
 from .console import console
-from .weather import Report
-from .data import WeatherAPI
+from .report import Report
 
 
 def main():
