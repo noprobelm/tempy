@@ -40,7 +40,6 @@ class Report:
 
         A data.Data object is instantiated based on the 'location', and 'api_key' args. The _imperial bool is used to
         influence the unit system of measurement to use when rendering the report.
-
         """
         self._unparsed = Data(location, api_key)
 
