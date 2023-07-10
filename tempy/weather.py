@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from datetime import datetime
 
 from rich import box
 from rich.align import Align
@@ -42,6 +43,9 @@ class Report:
             self._imperial = True
         else:
             self._imperial = False
+
+    def _parse_location(self, city: str, region: str) -> Text:
+        return Text(f"{city}, {region}")
 
     def _get_ascii_art(self, condition: str, is_day: bool):
         """Gets the ASCII art corresponding to current weather conditions and time of day
