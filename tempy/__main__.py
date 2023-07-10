@@ -1,11 +1,13 @@
 from .config import Config
-from .weather import Report
 from .console import console
+from .report import Report
 
 
 def main():
-    config = Config()
-    report = Report(config["location"], config["units"], config["api_key"])
+    config = Config.from_default()
+    report = Report.from_weatherapi(
+        config["location"], config["units"], config["api_key"]
+    )
     console.print(report)
 
 

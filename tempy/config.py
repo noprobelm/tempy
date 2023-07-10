@@ -2,26 +2,24 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Union, Optional
+from typing import Optional, Union
+
+from .parser import parse_rc
 
 VALID_OPTIONS = "location", "units", "api_key"
 
 
 class TempyRC(dict):
-    """Stores configuration information for tempy from the tempyrc file in the user's config path
-
-    Attributes:
-        1. path (Path): The path of tempyrc
-
-    """
+    """Stores configuration information for tempy from the tempyrc file in the user's config path"""
 
     def __init__(self, path: Union[Path, str]) -> None:
         """Creates instance of TempyRC with specified config file path
 
         1. If the tempyrc provided is found:
-            a. Parse the contents, ignoring lines that start with '#'
+            a. Parse the contents
+            b. Fill in empty key/value pairs; delete erroneous key/value pairs
         2. If no tempyrc is found:
-            a. If the tempyrc parent path does not exist, create it
+            a. If the tempyrc parent path does not exist, attempt to create it
             b. If tempyrc does not exist, create one from the skel
         3. Init dict superclass with tempyrc contents
 
@@ -29,46 +27,55 @@ class TempyRC(dict):
             path (str): The path of tempyrc (usually ~/.tempyrc/config)
         """
 
-        self.path = Path(path)
+        path = Path(path)
 
         try:
-            with open(self.path, "r") as f:
-                tempyrc = f.readlines()
+            with open(path, "r") as fp:
+                parsed = parse_rc(fp)
 
         except FileNotFoundError:
-            tempyrc_parent_path = self.path.parent
-            if not os.path.isdir(tempyrc_parent_path) and os.name == "posix":
+            self._copy_skel(path)
+            parsed = {option: "" for option in VALID_OPTIONS}
+
+        else:
+            for option in VALID_OPTIONS:
+                if option not in parsed.keys():
+                    parsed[option] = ""
+
+            for option in parsed:
+                if option not in VALID_OPTIONS:
+                    del parsed[option]
+
+        super().__init__(parsed)
+
+    def _copy_skel(self, path: Path) -> None:
+        """Copy tempyrc skel to user config path
+
+        For posix users:
+            - If the specified configuration path (usually ~/.config) does not exist, create it.
+            - If the parent of the specified configuration path does not exist, terminate tempy to avoid recursive path
+              creation
+
+        For Windows users:
+            - If the specified configuration path does not exist, warn the user and terminate.
+        """
+
+        tempyrc_parent_path = path.parent
+        if not os.path.isdir(tempyrc_parent_path):
+            if os.name == "posix":
                 try:
                     os.mkdir(tempyrc_parent_path)
                 except FileNotFoundError:
-                    print(f"Invalid config path '{tempyrc_parent_path}'")
-                    sys.exit()
+                    sys.exit(f"No such path: '{tempyrc_parent_path.parent}'")
+            elif os.name == "nt":
+                sys.exit(f"No such path: '{tempyrc_parent_path}'")
 
-            skel_path = os.path.join(Path(__file__).parent, "tempyrc")
+        skel_path = os.path.join(Path(__file__).parent, "tempyrc")
 
-            with open(skel_path, "r") as f:
-                skel = f.read()
-            with open(self.path, "w") as f:
-                f.write(skel)
-
-            config = {option: "" for option in VALID_OPTIONS}
-
-        else:
-            config = {}
-            for line in tempyrc:
-                line = line.strip()
-                if len(line) > 0 and line.startswith("#"):
-                    continue
-
-                line = [val.strip().lower() for val in line.split("=")]
-                if line[0] in VALID_OPTIONS:
-                    config[line[0]] = line[1]
-
-            for option in VALID_OPTIONS:
-                if option not in config.keys():
-                    config[option] = ""
-
-        super().__init__(config)
+        with open(skel_path, "r") as f:
+            skel = f.read()
+        with open(path, "w") as f:
+            f.write(skel)
 
 
 class Args(dict):
@@ -126,11 +133,7 @@ class Config(dict):
         _args (Args): Args sourced from cmdline args for priority comparison
     """
 
-    def __init__(
-        self,
-        tempyrc_path: Optional[Union[Path, str, None]] = None,
-        unparsed: Optional[Union[list[str], None]] = None,
-    ) -> None:
+    def __init__(self, tempyrc: TempyRC, args: Args) -> None:
         """Creates instance of TempyRC with specified config file path
 
         This is a convenience class used to select config data between command line args and the tempyrc
@@ -146,9 +149,8 @@ class Config(dict):
 
 
         Args:
-            1. tempyrc_path (Optional[Union[Path, str, None]]): Path to use for TempyRC. Default will use user config
-               path (~/.config for Linux)
-            2. unparsed (Optional[Union[list[str], None]]) : Unparsed command line args to use for Args. Default will
+            1. tempyrc (Union[TempyRC, None]): The TempyRC to compare
+            2. unparsed (Union[Args, None]]) : Unparsed command line args to use for Args. Default will
                use sys.argv[1:]
 
         TODO:
@@ -156,31 +158,40 @@ class Config(dict):
               the moment
         """
 
-        if tempyrc_path is None:
-            if os.name == "nt":
-                tempyrc_path = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
-            else:
-                tempyrc_path = f"{os.path.expanduser('~')}/.config/tempyrc"
-
-        self._tempyrc = TempyRC(tempyrc_path)
-
-        if unparsed is None:
-            self._args = Args(sys.argv[1:])
-        else:
-            self._args = Args(unparsed)
-
         config = {}
 
         for option in VALID_OPTIONS:
-            config[option] = self._args[option] or self._tempyrc[option]
+            config[option] = args[option] or tempyrc[option]
 
         if not config["location"]:
-            print(
-                f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {self._args.usage}"
-            )
+            print(f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {args.usage}")
             sys.exit()
 
         if not config["units"]:
             config["units"] = "imperial"
 
         super().__init__(config)
+
+    @classmethod
+    def from_default(cls) -> "Config":
+        """Constructor method to instantiate a Config object from a tempyrc path and sys.argv
+
+        Args:
+            1. tempyrc_path (Optional[Union[Path, str, None]]): Path to use for TempyRC. Default will use user config
+               path (~/.config for Linux)
+            2. unparsed (Optional[Union[list[str], None]]) : Unparsed command line args to use for Args. Default will
+               use sys.argv[1:]
+
+        Returns:
+            Config: An instance of self based on a tempyrc path and sys.argv[1:]
+        """
+
+        if os.name == "nt":
+            tempyrc_path = f"{os.path.expanduser('~')}\\AppData\\Roaming\\tempyrc"
+        else:
+            tempyrc_path = f"{os.path.expanduser('~')}/.config/tempyrc"
+
+        tempyrc = TempyRC(tempyrc_path)
+        args = Args(sys.argv[1:])
+
+        return cls(tempyrc, args)

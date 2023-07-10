@@ -1,35 +1,22 @@
 from tempy import config
 from ward import test, raises
-from pathlib import Path
-import shutil
-import os
 
 
-@test("Config will instantiate with no arguments")
+@test("Config will instantiate with no command line arguments")
 def _():
-    tempy_config = config.Config()
+    tempyrc = config.TempyRC("sample_tempyrcs/location_units_api")
+    args = config.Args([])
+
+    tempy_config = config.Config(tempyrc, args)
     assert isinstance(tempy_config, config.Config)
-
-
-@test("A valid config.TempyRC was parsed")
-def _():
-    tempy_config = config.Config()
-    assert all(key in tempy_config._tempyrc for key in config.VALID_OPTIONS)
-
-
-@test("A valid config.Args was parsed")
-def _():
-    tempy_config = config.Config()
-    assert all(key in tempy_config._args for key in config.VALID_OPTIONS)
 
 
 @test("Command line arguments take priority over tempyrc (if it exists in tempyrc)")
 def _():
-    tempyrc_path = "sample_tempyrcs/location_units_api"
-    tempyrc = config.TempyRC(tempyrc_path)
-    unparsed = ["beijing", "--units", "metric"]
+    tempyrc = config.TempyRC("sample_tempyrcs/location_units_api")
+    args = config.Args(["beijing", "--units", "metric"])
 
-    tempy_config = config.Config(tempyrc_path, unparsed)
+    tempy_config = config.Config(tempyrc, args)
 
     # Args take priority
     assert tempy_config["location"] == "beijing"
@@ -42,18 +29,18 @@ def _():
 
 @test("Tempy terminates if no location is found in tempyrc or command line args")
 def _():
-    tempyrc_path = "sample_tempyrcs/empty"
-    unparsed = []
+    tempyrc = config.TempyRC("sample_tempyrcs/empty")
+    args = config.Args([])
 
     with raises(SystemExit):
-        tempy_config = config.Config(tempyrc_path, unparsed)
+        config.Config(tempyrc, args)
 
 
 @test("Config will set 'units' default to 'imperial' if no units are specified")
 def _():
-    tempyrc_path = "sample_tempyrcs/location"
-    unparsed = []
+    tempyrc = config.TempyRC("sample_tempyrcs/location")
+    args = config.Args([])
 
-    tempy_config = config.Config(tempyrc_path, unparsed)
+    tempy_config = config.Config(tempyrc, args)
 
     assert tempy_config["units"] == "imperial"

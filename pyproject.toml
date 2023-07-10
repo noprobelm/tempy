@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tempy"
-version = "1.3.0"
+version = "1.4.0"
 description = "Render weather data beautifully to your terminal"
 authors = ["noprobelm <noprobelm@protonmail.com>"]
 license = "MIT"
