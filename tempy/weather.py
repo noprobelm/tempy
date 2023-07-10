@@ -16,33 +16,38 @@ from .themes import Default
 
 
 class Report:
-    """A terminal-renderable weather report
+    """A terminal-renderable weather report.
+
+    The purpose of this class is to provide a object that can be rendered to the terminal by the rich.console.Console
+    class.
+
+    This class uses the data.Data class to manage fetching the weather report data.
 
     Attributes:
-        1. _data (Data): The data.Data object containing weather report information retrieved from weatherapi.com or the proxy
-                  server
+        1. _unparsed (Data): The data.Data object containing weather report information retrieved from weatherapi.com or the proxy
+                             server
         2. _imperial (bool): Indicator for whether the weather report should display imperial (True) or metric (False)
+        3. condition (str): The current weather conditions (e.g. 'Overcast')
+        4. is_day (bool): Represents day or night for the weather report
+        5. location (str): The city and region of the weather report
+        6. localtime (str): The localtime formatted for the weather report
+        7. weather (dict): The current weather report
+        8. forecasts (list[dict]): A list of forecast reports, the first index being the current day
     """
 
     def __init__(self, location: str, units: str, api_key: str) -> None:
         """Initializes an instance of the Report class
 
-        A Data object is instantiated based on the 'location', and 'api_key' args. The _imperial bool is used to
+        A data.Data object is instantiated based on the 'location', and 'api_key' args. The _imperial bool is used to
         influence the unit system of measurement to use when rendering the report.
 
-        When this object is printed to the terminal using rich.console.Console, the __rich_console__ special method is
-        invoked:
-            1. The 'location' and 'localtime' data is pulled from the Data object
-            2. An ASCII art representation of the current weather conditions (and time of day) is generated
-            3. Tables containing current and forecasted conditions are generated
-            4. The weather report renderable is assembled and yielded
         """
         self._unparsed = Data(location, api_key)
 
         if units == "imperial":
-            self._imperial = True
+            imperial = True
         else:
-            self._imperial = False
+            imperial = False
 
         self.condition = self._unparsed["current"]["condition"]["text"]
         self.is_day = bool(self._unparsed["current"]["is_day"])
@@ -56,20 +61,47 @@ class Report:
         )
         self.localtime = self._parse_localtime(localtime)
 
-        self.weather = self._parse_weather(self._unparsed["current"], self._imperial)
+        self.weather = self._parse_weather(self._unparsed["current"], imperial)
 
         self.forecasts = []
         for day in self._unparsed["forecast"]["forecastday"]:
-            forecast = self._parse_forecast(day["day"], self._imperial)
+            forecast = self._parse_forecast(day["day"], imperial)
             self.forecasts.append(forecast)
 
     def _parse_location(self, city: str, region: str) -> str:
+        """Parses the weather report location for rendering
+
+        Args:
+            1. city (str): The city of the report
+            2. region (str): The region of the report
+
+        Returns:
+            str: The parsed string to be used in the weather report render
+        """
         return f"{city}, {region}"
 
     def _parse_localtime(self, localtime: datetime) -> str:
+        """Parses the localtime of the report for rendering
+
+        Args:
+            1. localtime (datetime): The datetime to parse
+
+        Returns:
+            str: The parsed string to be used in the weather report render
+        """
         return f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}"
 
     def _parse_weather(self, weather: dict, imperial: bool) -> dict:
+        """Parses the weather data of the report for rendering. This is later passed to the _get_weather_table method
+
+        Args:
+            1. weather (dict): A dict of the weather report
+            2. imperial (bool): Flag indicating whether the data should be parsed for imperial or metric
+
+        Returns:
+            dict: The weather report formatted for rendering
+        """
+
         def _parse_weather_imperial(weather: dict) -> dict:
             parsed = {
                 "temperature": f"{weather['temp_f']}°F",
@@ -108,6 +140,16 @@ class Report:
         return parsed
 
     def _parse_forecast(self, forecast: dict, imperial: bool) -> dict:
+        """Parses the forecast data of a given day for rendering. This is later passed to the _get_weather_table method
+
+        Args:
+            1. weather (dict): A dict of the weather report
+            2. imperial (bool): Flag indicating whether the data should be parsed for imperial or metric
+
+        Returns:
+            dict: The weather report formatted for rendering
+        """
+
         def _parse_forecast_imperial(forecast: dict) -> dict:
             parsed = {
                 "average": f"{forecast['avgtemp_f']}°F",
@@ -191,7 +233,6 @@ class Report:
     def _get_weather_table(self, table_data: dict, title: str) -> Table:
         """Builds a table of weather conditions for rendering to the terminal
 
-
         In the terminal, this is the 'current conditions', 'today's forecast', and each forecast in the lower region of
         the weather report renderable.
 
@@ -266,7 +307,7 @@ class Report:
         for num, day in enumerate(self.forecasts[1:]):
             date = datetime.strptime(
                 self._unparsed["location"]["localtime"], "%Y-%m-%d %H:%M"
-            ) + timedelta(days=num)
+            ) + timedelta(days=num + 1)
             title = f"{date.strftime('%A, %B')} {date.strftime('%e').strip()}"
             forecast_tables.append(self._get_weather_table(day, title))
 
