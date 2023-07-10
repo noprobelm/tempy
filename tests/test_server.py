@@ -2,7 +2,7 @@ from ward import test
 import socket
 from tempy import data
 
-weather_data = data.Data(location="nyc")
+weather_data = data.WeatherAPI(location="nyc")
 KEYS = ["location", "current", "forecast", "alerts"]
 CURRENT_KEYS = [
     "last_updated_epoch",
@@ -35,27 +35,27 @@ FORECAST_KEYS = ["date", "date_epoch", "day", "astro", "hour"]
 
 @test("Proxy server domain name resolves to 173.255.235.176")
 def _():
-    assert "173.255.235.176" == socket.gethostbyname(data.Data._proxy_domain)
+    assert "173.255.235.176" == socket.gethostbyname(data.WeatherAPI._proxy_domain)
 
 
 @test("All expected values from the v1 weatherapi are present")
 def _():
     for key in KEYS:
-        assert key in weather_data.keys()
+        assert key in weather_data.data.keys()
 
 
 @test("All expected keys for current weather data are present")
 def _():
     for key in CURRENT_KEYS:
-        assert key in weather_data["current"]
+        assert key in weather_data.data["current"]
 
 
 @test("Three days of forecast data are contained in the API response")
 def _():
-    assert len(weather_data["forecast"]["forecastday"]) == 3
+    assert len(weather_data.data["forecast"]["forecastday"]) == 3
 
 
 @test("All expected keys for forecast data are present")
 def _():
     for key in FORECAST_KEYS:
-        assert key in weather_data["forecast"]["forecastday"][0].keys()
+        assert key in weather_data.data["forecast"]["forecastday"][0].keys()
