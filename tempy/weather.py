@@ -53,6 +53,21 @@ class Report:
             style=Default.report_header,
         )
 
+    def _parse_weather_imperial(self, weather: dict) -> dict:
+        parsed = {
+            "temperature": f"{weather['current']['temp_f']}°F",
+            "wind": f"{weather['current']['wind_mph']} mph {weather['current']['wind_dir']}",
+            "gusts": f"{weather['current']['gust_mph']} mph",
+            "pressure": f"{weather['current']['pressure_in']} inHg",
+            "precipitation": f"{weather['current']['precip_in']} in",
+            "visibility": f"{weather['current']['vis_miles']} mi",
+            "humidity": f"{weather['current']['humidity']}%",
+            "cloud cover": f"{weather['current']['cloud']}%",
+            "UV index": f"{weather['current']['uv']}",
+        }
+
+        return parsed
+
     def _get_ascii_art(self, condition: str, is_day: bool):
         """Gets the ASCII art corresponding to current weather conditions and time of day
 
