@@ -47,7 +47,7 @@ class Report:
     def _parse_location(self, city: str, region: str) -> Text:
         return Text(f"{city}, {region}", style=Default.report_header)
 
-    def _parse_localtime(self, localtime: datetime):
+    def _parse_localtime(self, localtime: datetime) -> Text:
         return Text(
             f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}",
             style=Default.report_header,
