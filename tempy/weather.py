@@ -68,6 +68,51 @@ class Report:
 
         return parsed
 
+    def _parse_weather_metric(self, weather: dict) -> dict:
+        parsed = {
+            "temperature": f"{weather['current']['temp_c']}°C",
+            "wind": f"{weather['current']['wind_kph']} kph {weather['current']['wind_dir']}",
+            "gusts": f"{weather['current']['gust_kph']} kph",
+            "pressure": f"{int(weather['current']['pressure_mb'])} mb",
+            "precipitation": f"{weather['current']['precip_mm']} mm",
+            "visibility": f"{weather['current']['vis_km']} km",
+            "humidity": f"{weather['current']['humidity']}%",
+            "cloud cover": f"{weather['current']['cloud']}%",
+            "UV index": f"{weather['current']['uv']}",
+        }
+
+        return parsed
+
+    def _parse_forecast_imperial(self, forecast: dict) -> dict:
+        parsed = {
+            "average": f"{forecast['avgtemp_f']}°F",
+            "low": f"{forecast['mintemp_f']}°F",
+            "high": f"{forecast['maxtemp_f']}°F",
+            "gusts": f"{forecast['maxwind_mph']} mph",
+            "total precipitation": f"{forecast['totalprecip_in']} in",
+            "average visibility": f"{forecast['avgvis_miles']} mi",
+            "chance of rain": f"{forecast['daily_chance_of_rain']}%",
+            "chance of snow": f"{forecast['daily_chance_of_snow']}%",
+            "uv index": f"{forecast['uv']}",
+        }
+
+        return parsed
+
+    def _parse_forecast_metric(self, forecast: dict) -> dict:
+        parsed = {
+            "average": f"{forecast['avgtemp_c']}°C",
+            "low": f"{forecast['mintemp_c']}°C",
+            "high": f"{forecast['maxtemp_c']}°C",
+            "gusts": f"{forecast['maxwind_kph']} kph",
+            "total precipitation": f"{forecast['totalprecip_mm']} mm",
+            "average visibility": f"{forecast['avgvis_km']} km",
+            "chance of rain": f"{forecast['daily_chance_of_rain']}%",
+            "chance of snow": f"{forecast['daily_chance_of_snow']}%",
+            "uv index": f"{forecast['uv']}",
+        }
+
+        return parsed
+
     def _get_ascii_art(self, condition: str, is_day: bool):
         """Gets the ASCII art corresponding to current weather conditions and time of day
 
