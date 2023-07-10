@@ -26,8 +26,8 @@ class Report:
     def __init__(self, location: str, units: str, api_key: str) -> None:
         """Initializes an instance of the Report class
 
-        A Data object is instantiated based on the 'location', and 'api_key' args. The _imperial bool is set
-        accordingly.
+        A Data object is instantiated based on the 'location', and 'api_key' args. The _imperial bool is used to
+        influence the unit system of measurement to use when rendering the report.
 
         When this object is printed to the terminal using rich.console.Console, the __rich_console__ special method is
         invoked:
