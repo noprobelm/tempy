@@ -1,10 +1,36 @@
 from ward import test
 import socket
-import os
-from tempy import config
 from tempy import data
 
-KEYS = ["localdata", "weather", "forecast"]
+weather_data = data.Data(location="nyc")
+KEYS = ["location", "current", "forecast", "alerts"]
+CURRENT_KEYS = [
+    "last_updated_epoch",
+    "last_updated",
+    "temp_c",
+    "temp_f",
+    "is_day",
+    "condition",
+    "wind_mph",
+    "wind_kph",
+    "wind_degree",
+    "wind_dir",
+    "pressure_mb",
+    "pressure_in",
+    "precip_mm",
+    "precip_in",
+    "humidity",
+    "cloud",
+    "feelslike_c",
+    "feelslike_f",
+    "vis_km",
+    "vis_miles",
+    "uv",
+    "gust_mph",
+    "gust_kph",
+    "air_quality",
+]
+FORECAST_KEYS = ["date", "date_epoch", "day", "astro", "hour"]
 
 
 @test("Proxy server domain name resolves to 173.255.235.176")
@@ -12,21 +38,24 @@ def _():
     assert "173.255.235.176" == socket.gethostbyname(data.Data._proxy_domain)
 
 
-@test("Request to proxy server returns valid data")
+@test("All expected values from the v1 weatherapi are present")
 def _():
-    args = config.Args(["nyc"])
-    weather_data = data.Data(args["location"])
-
     for key in KEYS:
         assert key in weather_data.keys()
 
 
-@test("Request to weatherapi returns valid data")
+@test("All expected keys for current weather data are present")
 def _():
-    tempyrc = config.TempyRC(
-        os.path.join(os.path.expanduser("~"), ".config/tempyrc_test")
-    )
-    weather_data = data.Data(location=tempyrc["location"], api_key=tempyrc["api_key"])
+    for key in CURRENT_KEYS:
+        assert key in weather_data["current"]
 
-    for key in KEYS:
-        assert key in weather_data.keys()
+
+@test("Three days of forecast data are contained in the API response")
+def _():
+    assert len(weather_data["forecast"]["forecastday"]) == 3
+
+
+@test("All expected keys for forecast data are present")
+def _():
+    for key in FORECAST_KEYS:
+        assert key in weather_data["forecast"]["forecastday"][0].keys()
