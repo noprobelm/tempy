@@ -26,26 +26,11 @@ class Data(dict):
     def __init__(self, location: str, api_key: Optional[str] = ""):
         """Initializes an instance of the Data class
 
-        Reaches out to either the proxy server or weatherapi (depending on if API key is present). The resulting json
-        is then formatted/parsed/simplified for rendering.
+        Reaches out to either the proxy server or weatherapi (depending on if API key is present).
 
         Args:
             1. location (str): The location to request weather information for (can be city, state/province, zip code)
             2. api_key (Optional[str]): Optional API key to bypass proxy server
-
-        Keys:
-            - localdata (dict): A dict of the localdata parsed from the HTTP resonse
-                - location (str): The requested location
-                - localtime (str): A datetime str parsed to meet the needs of the weather.Report class
-            - weather (dict): A dict of the current weather data parsed from the HTTP response
-                - condition (str): str of the current weather conditions (e.g. "sunny")
-                - is_day (int): bool representing day or night for current weathe report
-                - imperial (dict[str, str]): The full weather report in imperial format
-                - metric (dict[str, str]): The full weather report in metric format
-            - forecast (list[dict]): A list of dicts containing daily forecast data. Each day:
-                - date (str): A datetime str parsed to emet the needs of the weather.Report class.
-                - imperial (dict[str, str]): The full forecast report in imperial format
-                - metric (dict[str, str]): The full forecast report in metric format
 
         """
 
