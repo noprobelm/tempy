@@ -12,7 +12,6 @@ from rich.text import Text
 
 from .console import console
 from .data import Data
-from .themes import Default
 
 
 class Report:
@@ -221,7 +220,7 @@ class Report:
 
         label = Text(
             condition.title().center(width),
-            style=Default.labels,
+            style="labels",
         )
 
         art.append("\n\n")
@@ -246,13 +245,13 @@ class Report:
             "labels",
             width=max([len(label) for label in table_data.keys()]),
             no_wrap=True,
-            style=Default.labels,
+            style="labels",
         )
         values = Column(
             "values",
             width=max([len(str(value)) for value in table_data.values()]),
             no_wrap=True,
-            style=Default.labels,
+            style="labels",
         )
         table = Table(
             labels,
@@ -260,8 +259,8 @@ class Report:
             show_edge=False,
             expand=False,
             show_header=False,
-            title_style=Default.table_header,
-            border_style=Default.table_divider,
+            title_style="table_header",
+            border_style="table_divider",
         )
 
         table.title = f"{title}\n"
@@ -294,8 +293,8 @@ class Report:
 
         After each region of the report has been rendered, we yield the upper, then the lower.
         """
-        location = Text(self.location, style=Default.report_header)
-        localtime = Text(self.localtime, style=Default.report_header)
+        location = Text(self.location, style="report_header")
+        localtime = Text(self.localtime, style="report_header")
         art = self._get_ascii_art(self.condition, self.is_day)
 
         weather_table = self._get_weather_table(self.weather, "Current Condiitons")
@@ -329,11 +328,11 @@ class Report:
             Group(
                 Align(location, "center"),
                 Align(localtime, "center"),
-                Rule(style=Default.panel_border_style),
+                Rule(style="panel_border"),
                 report_upper,
             ),
             box=box.HEAVY,
-            border_style=Default.panel_border_style,
+            border_style="panel_border",
         )
 
         report_lower = Table(
@@ -351,13 +350,13 @@ class Report:
             Panel(
                 Align(forecast_tables[1], "center"),
                 box=box.HEAVY,
-                style=Default.panel_border_style,
+                style="panel_border",
                 width=(report_lower.width // 2 - 1),
             ),
             Panel(
                 Align(forecast_tables[2], "center"),
                 box=box.HEAVY,
-                style=Default.panel_border_style,
+                style="panel_border",
                 width=(report_lower.width // 2 + 1)
                 if report_lower.width % 2 == 1
                 else report_lower.width // 2,
