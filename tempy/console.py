@@ -1,3 +1,4 @@
 from rich.console import Console
+from themes import DEFAULT
 
-console = Console()
+console = Console(theme=DEFAULT)
