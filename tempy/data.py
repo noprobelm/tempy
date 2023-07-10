@@ -132,14 +132,14 @@ class WeatherAPI:
 
         def _parse_weather_imperial(weather: dict) -> dict:
             parsed = {
-                "temperature": f"{weather['temp_f']}°F",
-                "wind": f"{weather['wind_mph']} mph {weather['wind_dir']}",
-                "gusts": f"{weather['gust_mph']} mph",
-                "pressure": f"{weather['pressure_in']} inHg",
-                "precipitation": f"{weather['precip_in']} in",
-                "visibility": f"{weather['vis_miles']} mi",
-                "humidity": f"{weather['humidity']}%",
-                "cloud cover": f"{weather['cloud']}%",
+                "Temperature": f"{weather['temp_f']}°F",
+                "Wind": f"{weather['wind_mph']} mph {weather['wind_dir']}",
+                "Gusts": f"{weather['gust_mph']} mph",
+                "Pressure": f"{weather['pressure_in']} inHg",
+                "Precipitation": f"{weather['precip_in']} in",
+                "Visibility": f"{weather['vis_miles']} mi",
+                "Humidity": f"{weather['humidity']}%",
+                "Cloud Cover": f"{weather['cloud']}%",
                 "UV index": f"{weather['uv']}",
             }
 
@@ -147,15 +147,15 @@ class WeatherAPI:
 
         def _parse_weather_metric(weather: dict) -> dict:
             parsed = {
-                "temperature": f"{weather['temp_c']}°C",
-                "wind": f"{weather['wind_kph']} kph {weather['wind_dir']}",
-                "gusts": f"{weather['gust_kph']} kph",
-                "pressure": f"{int(weather['pressure_mb'])} mb",
-                "precipitation": f"{weather['precip_mm']} mm",
-                "visibility": f"{weather['vis_km']} km",
-                "humidity": f"{weather['humidity']}%",
-                "cloud cover": f"{weather['cloud']}%",
-                "UV index": f"{weather['uv']}",
+                "Temperature": f"{weather['temp_c']}°C",
+                "Wind": f"{weather['wind_kph']} kph {weather['wind_dir']}",
+                "Gusts": f"{weather['gust_kph']} kph",
+                "Pressure": f"{int(weather['pressure_mb'])} mb",
+                "Precipitation": f"{weather['precip_mm']} mm",
+                "Visibility": f"{weather['vis_km']} km",
+                "Humidity": f"{weather['humidity']}%",
+                "Cloud Cover": f"{weather['cloud']}%",
+                "UV Index": f"{weather['uv']}",
             }
 
             return parsed
@@ -180,15 +180,15 @@ class WeatherAPI:
 
         def _parse_forecast_imperial(forecast: dict) -> dict:
             parsed = {
-                "average": f"{forecast['avgtemp_f']}°F",
-                "low": f"{forecast['mintemp_f']}°F",
-                "high": f"{forecast['maxtemp_f']}°F",
-                "gusts": f"{forecast['maxwind_mph']} mph",
-                "total precipitation": f"{forecast['totalprecip_in']} in",
-                "average visibility": f"{forecast['avgvis_miles']} mi",
-                "chance of rain": f"{forecast['daily_chance_of_rain']}%",
-                "chance of snow": f"{forecast['daily_chance_of_snow']}%",
-                "uv index": f"{forecast['uv']}",
+                "Average": f"{forecast['avgtemp_f']}°F",
+                "Low": f"{forecast['mintemp_f']}°F",
+                "High": f"{forecast['maxtemp_f']}°F",
+                "Gusts": f"{forecast['maxwind_mph']} mph",
+                "Total Precipitation": f"{forecast['totalprecip_in']} in",
+                "Average Visibility": f"{forecast['avgvis_miles']} mi",
+                "Chance Of Rain": f"{forecast['daily_chance_of_rain']}%",
+                "Chance Of Snow": f"{forecast['daily_chance_of_snow']}%",
+                "UV Index": f"{forecast['uv']}",
             }
 
             return parsed

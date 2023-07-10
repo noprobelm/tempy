@@ -21,6 +21,15 @@ class Report:
     The purpose of this class is to provide a object that can be rendered to the terminal by the rich.console.Console
     class.
 
+    NOTE: If this class is being instantiated any way other than using the data generated from the WeatherAPI.parse
+          method, take care to ensure the 'condition' arg matches at least one of the asset filenames in the assets
+          directory of this project. The 'condition' arg is directly referenced when loading ASCII art assets
+
+    TODO: Low priority: Add option to exclude ASCII art from terminal render. This will loosen the requirements for the
+          'condition' arg to match the ASCII art assets, making it easier to generate weather reports using data from
+          non-weatherapi.com sources. Highly doubtful this will ever be used since, in all likelihood, all userse of
+          tempy are interfacing with the __main__ module and NOT adapting this class to their own use.
+
     Attributes:
         1. localtime (datetime): The localtime of the location of the weather report. This is used to generate the report
         header and forecast headers
@@ -161,7 +170,7 @@ class Report:
 
         table.title = f"{title}\n"
         for label in table_data:
-            table.add_row(label.title(), table_data[label])
+            table.add_row(label, table_data[label])
 
         return table
 
