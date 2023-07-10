@@ -24,15 +24,16 @@ class Report:
     This class uses the data.Data class to manage fetching the weather report data.
 
     Attributes:
-        1. _unparsed (Data): The data.Data object containing weather report information retrieved from weatherapi.com or the proxy
-                             server
-        2. _imperial (bool): Indicator for whether the weather report should display imperial (True) or metric (False)
-        3. condition (str): The current weather conditions (e.g. 'Overcast')
-        4. is_day (bool): Represents day or night for the weather report
-        5. location (str): The city and region of the weather report
-        6. localtime (str): The localtime formatted for the weather report
-        7. weather (dict): The current weather report
-        8. forecasts (list[dict]): A list of forecast reports, the first index being the current day
+        1. localtime (datetime): The localtime of the location of the weather report. This is used to generate the report
+        header and forecast headers
+        2. is_day (bool): Boolean indicating day or night. Used in conjunction with 'condition' to select the ASCII art
+        3. location (str): The location to display in the report header
+        4. condition (str): The current weather condition. Used in conjunction with 'is_day' to select the ASCII art
+        5. weather_table (dict): The data to display in the table for current weather conditions. The key/value pairs
+           should contain the deisred text for rendering.
+        6. forecast_tables (list[dict]): A list of the tables to use for forecast conditions. The key/value pairs should
+           contain the desired text for rendering
+
     """
 
     def __init__(
@@ -68,6 +69,16 @@ class Report:
         return f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}"
 
     def _get_localtime_timedelta(self, days: int) -> str:
+        """Parses the localtime and adds a specified timedelta
+
+        This is used to generate table headers for the forecast tables.
+
+        Args:
+            days (int): The number of days to add to the localtime instance variable
+
+        Returns:
+            str: A formatted string of the datetime (e.g. 'Tuesday, July 11')
+        """
         date = self.localtime + timedelta(days=days)
         title = f"{date.strftime('%A, %B')} {date.strftime('%e').strip()}"
         return title
@@ -158,6 +169,17 @@ class Report:
 
     @classmethod
     def from_weatherapi(cls, location: str, units: str, api_key: Optional[str] = ""):
+        """Convenience method used to create a Report object using data sourced from weatherapi.com
+
+        Args:
+            location (str): The location to use for the API request
+            units (str): The unit of measurement to parse the weather data into ('imperial' or 'metric')
+            api_key (Optional[str]): API key to use if the user has one. Fallback is to use noprobelm.dev as the
+                                     proxy domain
+
+        Returns:
+            Report: An instance of the Report class
+        """
         data = WeatherAPI(location, api_key)
         data = data.parse(units)
 
