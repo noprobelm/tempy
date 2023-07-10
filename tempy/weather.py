@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from rich import box
 from rich.align import Align
@@ -37,12 +37,31 @@ class Report:
             3. Tables containing current and forecasted conditions are generated
             4. The weather report renderable is assembled and yielded
         """
-        self._data = Data(location, api_key)
+        self._unparsed = Data(location, api_key)
 
         if units == "imperial":
             self._imperial = True
         else:
             self._imperial = False
+
+        self.condition = self._unparsed["current"]["condition"]["text"]
+        self.is_day = bool(self._unparsed["current"]["is_day"])
+
+        self.location = self._parse_location(
+            self._unparsed["location"]["name"], self._unparsed["location"]["region"]
+        )
+
+        localtime = datetime.strptime(
+            self._unparsed["location"]["localtime"], "%Y-%m-%d %H:%M"
+        )
+        self.localtime = self._parse_localtime(localtime)
+
+        self.weather = self._parse_weather(self._unparsed["current"], self._imperial)
+
+        self.forecasts = []
+        for day in self._unparsed["forecast"]["forecastday"]:
+            forecast = self._parse_forecast(day["day"], self._imperial)
+            self.forecasts.append(forecast)
 
     def _parse_location(self, city: str, region: str) -> str:
         return f"{city}, {region}"
@@ -50,63 +69,79 @@ class Report:
     def _parse_localtime(self, localtime: datetime) -> str:
         return f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}"
 
-    def _parse_weather_imperial(self, weather: dict) -> dict:
-        parsed = {
-            "temperature": f"{weather['current']['temp_f']}°F",
-            "wind": f"{weather['current']['wind_mph']} mph {weather['current']['wind_dir']}",
-            "gusts": f"{weather['current']['gust_mph']} mph",
-            "pressure": f"{weather['current']['pressure_in']} inHg",
-            "precipitation": f"{weather['current']['precip_in']} in",
-            "visibility": f"{weather['current']['vis_miles']} mi",
-            "humidity": f"{weather['current']['humidity']}%",
-            "cloud cover": f"{weather['current']['cloud']}%",
-            "UV index": f"{weather['current']['uv']}",
-        }
+    def _parse_weather(self, weather: dict, imperial: bool) -> dict:
+        def _parse_weather_imperial(weather: dict) -> dict:
+            parsed = {
+                "temperature": f"{weather['temp_f']}°F",
+                "wind": f"{weather['wind_mph']} mph {weather['wind_dir']}",
+                "gusts": f"{weather['gust_mph']} mph",
+                "pressure": f"{weather['pressure_in']} inHg",
+                "precipitation": f"{weather['precip_in']} in",
+                "visibility": f"{weather['vis_miles']} mi",
+                "humidity": f"{weather['humidity']}%",
+                "cloud cover": f"{weather['cloud']}%",
+                "UV index": f"{weather['uv']}",
+            }
+
+            return parsed
+
+        def _parse_weather_metric(weather: dict) -> dict:
+            parsed = {
+                "temperature": f"{weather['temp_c']}°C",
+                "wind": f"{weather['wind_kph']} kph {weather['wind_dir']}",
+                "gusts": f"{weather['gust_kph']} kph",
+                "pressure": f"{int(weather['pressure_mb'])} mb",
+                "precipitation": f"{weather['precip_mm']} mm",
+                "visibility": f"{weather['vis_km']} km",
+                "humidity": f"{weather['humidity']}%",
+                "cloud cover": f"{weather['cloud']}%",
+                "UV index": f"{weather['uv']}",
+            }
+
+            return parsed
+
+        if imperial == True:
+            parsed = _parse_weather_imperial(weather)
+        else:
+            parsed = _parse_weather_metric(weather)
 
         return parsed
 
-    def _parse_weather_metric(self, weather: dict) -> dict:
-        parsed = {
-            "temperature": f"{weather['current']['temp_c']}°C",
-            "wind": f"{weather['current']['wind_kph']} kph {weather['current']['wind_dir']}",
-            "gusts": f"{weather['current']['gust_kph']} kph",
-            "pressure": f"{int(weather['current']['pressure_mb'])} mb",
-            "precipitation": f"{weather['current']['precip_mm']} mm",
-            "visibility": f"{weather['current']['vis_km']} km",
-            "humidity": f"{weather['current']['humidity']}%",
-            "cloud cover": f"{weather['current']['cloud']}%",
-            "UV index": f"{weather['current']['uv']}",
-        }
+    def _parse_forecast(self, forecast: dict, imperial: bool) -> dict:
+        def _parse_forecast_imperial(forecast: dict) -> dict:
+            parsed = {
+                "average": f"{forecast['avgtemp_f']}°F",
+                "low": f"{forecast['mintemp_f']}°F",
+                "high": f"{forecast['maxtemp_f']}°F",
+                "gusts": f"{forecast['maxwind_mph']} mph",
+                "total precipitation": f"{forecast['totalprecip_in']} in",
+                "average visibility": f"{forecast['avgvis_miles']} mi",
+                "chance of rain": f"{forecast['daily_chance_of_rain']}%",
+                "chance of snow": f"{forecast['daily_chance_of_snow']}%",
+                "uv index": f"{forecast['uv']}",
+            }
 
-        return parsed
+            return parsed
 
-    def _parse_forecast_imperial(self, forecast: dict) -> dict:
-        parsed = {
-            "average": f"{forecast['avgtemp_f']}°F",
-            "low": f"{forecast['mintemp_f']}°F",
-            "high": f"{forecast['maxtemp_f']}°F",
-            "gusts": f"{forecast['maxwind_mph']} mph",
-            "total precipitation": f"{forecast['totalprecip_in']} in",
-            "average visibility": f"{forecast['avgvis_miles']} mi",
-            "chance of rain": f"{forecast['daily_chance_of_rain']}%",
-            "chance of snow": f"{forecast['daily_chance_of_snow']}%",
-            "uv index": f"{forecast['uv']}",
-        }
+        def _parse_forecast_metric(forecast: dict) -> dict:
+            parsed = {
+                "average": f"{forecast['avgtemp_c']}°C",
+                "low": f"{forecast['mintemp_c']}°C",
+                "high": f"{forecast['maxtemp_c']}°C",
+                "gusts": f"{forecast['maxwind_kph']} kph",
+                "total precipitation": f"{forecast['totalprecip_mm']} mm",
+                "average visibility": f"{forecast['avgvis_km']} km",
+                "chance of rain": f"{forecast['daily_chance_of_rain']}%",
+                "chance of snow": f"{forecast['daily_chance_of_snow']}%",
+                "uv index": f"{forecast['uv']}",
+            }
 
-        return parsed
+            return parsed
 
-    def _parse_forecast_metric(self, forecast: dict) -> dict:
-        parsed = {
-            "average": f"{forecast['avgtemp_c']}°C",
-            "low": f"{forecast['mintemp_c']}°C",
-            "high": f"{forecast['maxtemp_c']}°C",
-            "gusts": f"{forecast['maxwind_kph']} kph",
-            "total precipitation": f"{forecast['totalprecip_mm']} mm",
-            "average visibility": f"{forecast['avgvis_km']} km",
-            "chance of rain": f"{forecast['daily_chance_of_rain']}%",
-            "chance of snow": f"{forecast['daily_chance_of_snow']}%",
-            "uv index": f"{forecast['uv']}",
-        }
+        if imperial == True:
+            parsed = _parse_forecast_imperial(forecast)
+        else:
+            parsed = _parse_forecast_metric(forecast)
 
         return parsed
 
@@ -219,42 +254,21 @@ class Report:
 
         After each region of the report has been rendered, we yield the upper, then the lower.
         """
-        location = Text(
-            self._data["localdata"]["location"], style=Default.report_header
-        )
-        localtime = Text(
-            self._data["localdata"]["localtime"], style=Default.report_header
-        )
-        art = self._get_ascii_art(
-            self._data["weather"]["condition"], self._data["weather"]["is_day"]
-        )
-        if self._imperial == True:
-            weather_table = self._get_weather_table(
-                self._data["weather"]["imperial"], "Current Conditions"
-            )
+        location = Text(self.location, style=Default.report_header)
+        localtime = Text(self.localtime, style=Default.report_header)
+        art = self._get_ascii_art(self.condition, self.is_day)
 
-            forecast = self._data["forecast"]
-            forecast_tables = [
-                self._get_weather_table(forecast[0]["imperial"], "Today's Forecast")
-            ]
-            for day in forecast[1:]:
-                forecast_tables.append(
-                    self._get_weather_table(day["imperial"], f"{day['date']}")
-                )
+        weather_table = self._get_weather_table(self.weather, "Current Condiitons")
 
-        else:
-            weather_table = self._get_weather_table(
-                self._data["weather"]["metric"], "Current Conditions"
-            )
-
-            forecast = self._data["forecast"]
-            forecast_tables = [
-                self._get_weather_table(forecast[0]["metric"], "Today's Forecast")
-            ]
-            for day in forecast[1:]:
-                forecast_tables.append(
-                    self._get_weather_table(day["metric"], f"{day['date']}")
-                )
+        forecast_tables = [
+            self._get_weather_table(self.forecasts[0], "Today's Forecast")
+        ]
+        for num, day in enumerate(self.forecasts[1:]):
+            date = datetime.strptime(
+                self._unparsed["location"]["localtime"], "%Y-%m-%d %H:%M"
+            ) + timedelta(days=num)
+            title = f"{date.strftime('%A, %B')} {date.strftime('%e').strip()}"
+            forecast_tables.append(self._get_weather_table(day, title))
 
         report_upper = Table(
             Column("Art"),
