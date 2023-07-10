@@ -1,6 +1,8 @@
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
+from .data import WeatherAPI
 
 from rich import box
 from rich.align import Align
@@ -11,7 +13,6 @@ from rich.table import Column, Table
 from rich.text import Text
 
 from .console import console
-from .data import Data
 
 
 class Report:
@@ -34,51 +35,28 @@ class Report:
         8. forecasts (list[dict]): A list of forecast reports, the first index being the current day
     """
 
-    def __init__(self, location: str, units: str, api_key: str) -> None:
+    def __init__(
+        self,
+        localtime: datetime,
+        is_day: bool,
+        location: str,
+        condition: str,
+        weather_table: dict,
+        forecast_tables: list[dict],
+    ) -> None:
         """Initializes an instance of the Report class
 
         A data.Data object is instantiated based on the 'location', and 'api_key' args. The _imperial bool is used to
         influence the unit system of measurement to use when rendering the report.
         """
-        self._unparsed = Data(location, api_key)
+        self.localtime = localtime
+        self.is_day = is_day
+        self.location = location
+        self.condition = condition
+        self.weather_table = weather_table
+        self.forecast_tables = forecast_tables
 
-        if units == "imperial":
-            imperial = True
-        else:
-            imperial = False
-
-        self.condition = self._unparsed["current"]["condition"]["text"]
-        self.is_day = bool(self._unparsed["current"]["is_day"])
-
-        self.location = self._parse_location(
-            self._unparsed["location"]["name"], self._unparsed["location"]["region"]
-        )
-
-        localtime = datetime.strptime(
-            self._unparsed["location"]["localtime"], "%Y-%m-%d %H:%M"
-        )
-        self.localtime = self._parse_localtime(localtime)
-
-        self.weather = self._parse_weather(self._unparsed["current"], imperial)
-
-        self.forecasts = []
-        for day in self._unparsed["forecast"]["forecastday"]:
-            forecast = self._parse_forecast(day["day"], imperial)
-            self.forecasts.append(forecast)
-
-    def _parse_location(self, city: str, region: str) -> str:
-        """Parses the weather report location for rendering
-
-        Args:
-            1. city (str): The city of the report
-            2. region (str): The region of the report
-
-        Returns:
-            str: The parsed string to be used in the weather report render
-        """
-        return f"{city}, {region}"
-
-    def _parse_localtime(self, localtime: datetime) -> str:
+    def _get_localtime_header(self, localtime: datetime) -> str:
         """Parses the localtime of the report for rendering
 
         Args:
@@ -89,101 +67,10 @@ class Report:
         """
         return f"{localtime.strftime('%A, %B')} {localtime.strftime('%e').strip()}{localtime.strftime(' | %H:%M')}"
 
-    def _parse_weather(self, weather: dict, imperial: bool) -> dict:
-        """Parses the weather data of the report for rendering. This is later passed to the _get_weather_table method
-
-        Args:
-            1. weather (dict): A dict of the weather report
-            2. imperial (bool): Flag indicating whether the data should be parsed for imperial or metric
-
-        Returns:
-            dict: The weather report formatted for rendering
-        """
-
-        def _parse_weather_imperial(weather: dict) -> dict:
-            parsed = {
-                "temperature": f"{weather['temp_f']}°F",
-                "wind": f"{weather['wind_mph']} mph {weather['wind_dir']}",
-                "gusts": f"{weather['gust_mph']} mph",
-                "pressure": f"{weather['pressure_in']} inHg",
-                "precipitation": f"{weather['precip_in']} in",
-                "visibility": f"{weather['vis_miles']} mi",
-                "humidity": f"{weather['humidity']}%",
-                "cloud cover": f"{weather['cloud']}%",
-                "UV index": f"{weather['uv']}",
-            }
-
-            return parsed
-
-        def _parse_weather_metric(weather: dict) -> dict:
-            parsed = {
-                "temperature": f"{weather['temp_c']}°C",
-                "wind": f"{weather['wind_kph']} kph {weather['wind_dir']}",
-                "gusts": f"{weather['gust_kph']} kph",
-                "pressure": f"{int(weather['pressure_mb'])} mb",
-                "precipitation": f"{weather['precip_mm']} mm",
-                "visibility": f"{weather['vis_km']} km",
-                "humidity": f"{weather['humidity']}%",
-                "cloud cover": f"{weather['cloud']}%",
-                "UV index": f"{weather['uv']}",
-            }
-
-            return parsed
-
-        if imperial == True:
-            parsed = _parse_weather_imperial(weather)
-        else:
-            parsed = _parse_weather_metric(weather)
-
-        return parsed
-
-    def _parse_forecast(self, forecast: dict, imperial: bool) -> dict:
-        """Parses the forecast data of a given day for rendering. This is later passed to the _get_weather_table method
-
-        Args:
-            1. weather (dict): A dict of the weather report
-            2. imperial (bool): Flag indicating whether the data should be parsed for imperial or metric
-
-        Returns:
-            dict: The weather report formatted for rendering
-        """
-
-        def _parse_forecast_imperial(forecast: dict) -> dict:
-            parsed = {
-                "average": f"{forecast['avgtemp_f']}°F",
-                "low": f"{forecast['mintemp_f']}°F",
-                "high": f"{forecast['maxtemp_f']}°F",
-                "gusts": f"{forecast['maxwind_mph']} mph",
-                "total precipitation": f"{forecast['totalprecip_in']} in",
-                "average visibility": f"{forecast['avgvis_miles']} mi",
-                "chance of rain": f"{forecast['daily_chance_of_rain']}%",
-                "chance of snow": f"{forecast['daily_chance_of_snow']}%",
-                "uv index": f"{forecast['uv']}",
-            }
-
-            return parsed
-
-        def _parse_forecast_metric(forecast: dict) -> dict:
-            parsed = {
-                "average": f"{forecast['avgtemp_c']}°C",
-                "low": f"{forecast['mintemp_c']}°C",
-                "high": f"{forecast['maxtemp_c']}°C",
-                "gusts": f"{forecast['maxwind_kph']} kph",
-                "total precipitation": f"{forecast['totalprecip_mm']} mm",
-                "average visibility": f"{forecast['avgvis_km']} km",
-                "chance of rain": f"{forecast['daily_chance_of_rain']}%",
-                "chance of snow": f"{forecast['daily_chance_of_snow']}%",
-                "uv index": f"{forecast['uv']}",
-            }
-
-            return parsed
-
-        if imperial == True:
-            parsed = _parse_forecast_imperial(forecast)
-        else:
-            parsed = _parse_forecast_metric(forecast)
-
-        return parsed
+    def _get_localtime_timedelta(self, days: int) -> str:
+        date = self.localtime + timedelta(days=days)
+        title = f"{date.strftime('%A, %B')} {date.strftime('%e').strip()}"
+        return title
 
     def _get_ascii_art(self, condition: str, is_day: bool):
         """Gets the ASCII art corresponding to current weather conditions and time of day
@@ -269,6 +156,20 @@ class Report:
 
         return table
 
+    @classmethod
+    def from_weatherapi(cls, location: str, units: str, api_key: Optional[str] = ""):
+        data = WeatherAPI(location, api_key)
+        data = data.parse(units)
+
+        return cls(
+            data["localtime"],
+            data["is_day"],
+            data["location"],
+            data["condition"],
+            data["weather_table"],
+            data["forecast_tables"],
+        )
+
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
@@ -294,20 +195,21 @@ class Report:
         After each region of the report has been rendered, we yield the upper, then the lower.
         """
         location = Text(self.location, style="report_header")
-        localtime = Text(self.localtime, style="report_header")
+        localtime = Text(
+            self._get_localtime_header(self.localtime), style="report_header"
+        )
         art = self._get_ascii_art(self.condition, self.is_day)
 
-        weather_table = self._get_weather_table(self.weather, "Current Condiitons")
+        weather_table = self._get_weather_table(
+            self.weather_table, "Current Condiitons"
+        )
 
         forecast_tables = [
-            self._get_weather_table(self.forecasts[0], "Today's Forecast")
+            self._get_weather_table(self.forecast_tables[0], "Today's Forecast")
         ]
-        for num, day in enumerate(self.forecasts[1:]):
-            date = datetime.strptime(
-                self._unparsed["location"]["localtime"], "%Y-%m-%d %H:%M"
-            ) + timedelta(days=num + 1)
-            title = f"{date.strftime('%A, %B')} {date.strftime('%e').strip()}"
-            forecast_tables.append(self._get_weather_table(day, title))
+        for num, day in enumerate(self.forecast_tables[1:]):
+            date_header = self._get_localtime_timedelta(num + 1)
+            forecast_tables.append(self._get_weather_table(day, date_header))
 
         report_upper = Table(
             Column("Art"),
