@@ -2,7 +2,6 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
-from .data import WeatherAPI
 
 from rich import box
 from rich.align import Align
@@ -13,6 +12,7 @@ from rich.table import Column, Table
 from rich.text import Text
 
 from .console import console
+from .data import WeatherAPI
 
 
 class Report:
@@ -188,15 +188,15 @@ class Report:
             Report: An instance of the Report class
         """
         data = WeatherAPI(location, api_key)
-        data = data.parse(units)
+        parsed = data.parse(units)
 
         return cls(
-            data["localtime"],
-            data["is_day"],
-            data["location"],
-            data["condition"],
-            data["weather_table"],
-            data["forecast_tables"],
+            parsed["localtime"],
+            parsed["is_day"],
+            parsed["location"],
+            parsed["condition"],
+            parsed["weather_table"],
+            parsed["forecast_tables"],
         )
 
     def __rich_console__(
@@ -255,7 +255,7 @@ class Report:
         report_upper.width = (console.measure(report_upper).maximum) + sum(
             [report_upper.padding[1], report_upper.padding[3]]
         )
-        report_upper = Panel.fit(
+        report_upper_panel = Panel.fit(
             Group(
                 Align(location, "center"),
                 Align(localtime, "center"),
@@ -276,7 +276,7 @@ class Report:
             padding=0,
         )
 
-        report_lower.width = console.measure(report_upper).maximum
+        report_lower.width = console.measure(report_upper_panel).maximum
         report_lower.add_row(
             Panel(
                 Align(forecast_tables[1], "center"),
@@ -293,5 +293,5 @@ class Report:
                 else report_lower.width // 2,
             ),
         )
-        yield report_upper
+        yield report_upper_panel
         yield report_lower

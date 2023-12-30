@@ -1,6 +1,5 @@
 from rich.theme import Theme
 
-
 DEFAULT = Theme(
     {
         "panel_border": "blue",

@@ -1,8 +1,8 @@
 import sys
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
-import requests
+import requests  # type: ignore
 
 from .console import console
 

@@ -9,9 +9,9 @@ def parse_rc(fp: TextIO) -> dict:
         if len(line) > 0 and line.startswith("#"):
             continue
 
-        line = [val.strip().lower() for val in line.split("=")]
+        split = [val.strip().lower() for val in line.split("=")]
         try:
-            parsed[line[0]] = line[1]
+            parsed[split[0]] = split[1]
         except IndexError:
             pass
 

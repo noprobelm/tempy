@@ -164,7 +164,9 @@ class Config(dict):
             config[option] = args[option] or tempyrc[option]
 
         if not config["location"]:
-            print(f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {args.usage}")
+            print(
+                f"Error: 'location' not provided in tempyrc or as command line arg. Usage: {args.usage}"
+            )
             sys.exit()
 
         if not config["units"]:
