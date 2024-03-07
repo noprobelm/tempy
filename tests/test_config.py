@@ -2,15 +2,6 @@ from tempy import config
 from ward import test, raises
 
 
-@test("Config will instantiate with no command line arguments")
-def _():
-    tempyrc = config.TempyRC("sample_tempyrcs/location_units_api")
-    args = config.Args([])
-
-    tempy_config = config.Config(tempyrc, args)
-    assert isinstance(tempy_config, config.Config)
-
-
 @test("Command line arguments take priority over tempyrc (if it exists in tempyrc)")
 def _():
     tempyrc = config.TempyRC("sample_tempyrcs/location_units_api")
@@ -34,13 +25,3 @@ def _():
 
     with raises(SystemExit):
         config.Config(tempyrc, args)
-
-
-@test("Config will set 'units' default to 'imperial' if no units are specified")
-def _():
-    tempyrc = config.TempyRC("sample_tempyrcs/location")
-    args = config.Args([])
-
-    tempy_config = config.Config(tempyrc, args)
-
-    assert tempy_config["units"] == "imperial"

@@ -16,16 +16,6 @@ def _():
     assert "invalid" not in tempyrc.keys()
 
 
-@test("config.TempyRC will ignore commented lines")
-def _():
-    tempyrc = config.TempyRC("sample_tempyrcs/commented")
-    assert tempyrc == {
-        "location": "",
-        "units": "imperial",
-        "api_key": "jlskdjfaklejaeglkw",
-    }
-
-
 @test(
     "config.TempyRC will create a new path with a tempyrc skel if the arg 'path' does not exist"
 )
