@@ -19,7 +19,7 @@ class WeatherAPI:
 
     """
 
-    _proxy_domain = "noprobelm.dev"
+    _proxy_domain = "173.255.235.176"
     _proxy_port = 80
     _api_endpoint = "https://api.weatherapi.com/v1"
 
