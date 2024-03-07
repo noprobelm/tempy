@@ -1,6 +1,6 @@
 # tempy
 
-![tempy](tempy.png)
+![tempy](media/tempy.png)
 
 `tempy` will render a simple, visually pleasing weather report for current and near-future conditions to your terminal.
 
@@ -20,7 +20,7 @@ pip install git+https://github.com/noprobelm/tempy
 
 - Units are imperial by default. Specify the unit system you desire with the `-u` or `--units` flags: `tempy nyc -u metric` 
 
-![demo](demo.png)
+![demo](media/demo.png)
 
 ## Configuration
 
